@@ -1,4 +1,4 @@
-package org.learnings.payments.transactionsservice.controllers;
+package org.learnings.payments.paymentservice.web.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;

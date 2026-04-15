@@ -1,6 +1,14 @@
 services:
   payments-service:
     build: payments-service
+    depends_on:
+      - postgres-db
+    environment:
+      - DEPLOYMENT_ENVIRONMENT=docker-compose
+      - DB_USERNAME=psp_user
+      - DB_PASSWORD=S3cret
+    #      for java remote debugger open a port, eg 5005:
+    #      - JAVA_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
     ports:
       - "8090:8080"
 
@@ -8,3 +16,17 @@ services:
     build: transactions-service
     ports:
       - "8080:8080"
+
+  postgres-db:
+    image: postgres:16.2-alpine3.19
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata6:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=psp_user
+      - POSTGRES_PASSWORD=S3cret
+      - POSTGRES_DB=psp
+
+volumes:
+  dbdata6:
