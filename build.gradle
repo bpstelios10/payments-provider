@@ -37,9 +37,13 @@ subprojects { subproj ->
         dependencies {
             implementation 'org.springframework.boot:spring-boot-starter-web'
             implementation 'org.springframework.boot:spring-boot-starter-actuator'
+            implementation 'org.springframework.boot:spring-boot-starter-validation'
 
             implementation 'io.micrometer:micrometer-registry-prometheus:1.16.5'
             implementation 'io.prometheus:simpleclient_hotspot:0.16.0'
+
+            compileOnly 'org.projectlombok:lombok:1.18.44'
+            annotationProcessor 'org.projectlombok:lombok:1.18.44'
 
             testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
             test.useJUnitPlatform()
@@ -48,4 +52,8 @@ subprojects { subproj ->
         jar.enabled=false
         bootJar.archiveFileName='service.jar'
     }
+}
+
+wrapper {
+    gradleVersion = "9.2.0"
 }

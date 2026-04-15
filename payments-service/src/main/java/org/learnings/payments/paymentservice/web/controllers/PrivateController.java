@@ -1,4 +1,4 @@
-package org.learnings.payments.transactionsservice.controllers;
+package org.learnings.payments.paymentservice.web.controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
