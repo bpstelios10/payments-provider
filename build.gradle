@@ -1,0 +1,51 @@
+plugins {
+    id 'org.springframework.boot' version '4.1.0-M4' apply false
+    id 'io.spring.dependency-management' version '1.1.7' apply false
+}
+
+ext {
+    versions = [
+    ]
+
+    javaProjects = ['payments-service', 'transactions-service']
+    springWebProjects = ['payments-service', 'transactions-service']
+}
+
+group = 'org.learnings.payments'
+version = '1.0-SNAPSHOT'
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects { subproj ->
+    if (javaProjects.contains(subproj.name)) {
+        apply plugin: 'java'
+
+        java {
+            sourceCompatibility = JavaVersion.VERSION_25
+            targetCompatibility = JavaVersion.VERSION_25
+        }
+    }
+
+    if (springWebProjects.contains(subproj.name)) {
+        apply plugin: 'org.springframework.boot'
+        apply plugin: 'io.spring.dependency-management'
+
+        dependencies {
+            implementation 'org.springframework.boot:spring-boot-starter-web'
+            implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+            implementation 'io.micrometer:micrometer-registry-prometheus:1.16.5'
+            implementation 'io.prometheus:simpleclient_hotspot:0.16.0'
+
+            testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+            test.useJUnitPlatform()
+        }
+
+        jar.enabled=false
+        bootJar.archiveFileName='service.jar'
+    }
+}

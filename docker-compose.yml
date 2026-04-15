@@ -1,0 +1,10 @@
+services:
+  payments-service:
+    build: payments-service
+    ports:
+      - "8090:8080"
+
+  transactions-service:
+    build: transactions-service
+    ports:
+      - "8080:8080"
