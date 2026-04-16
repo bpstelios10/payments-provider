@@ -7,21 +7,32 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.learnings.payments.paymentservice.domain.Payment;
+import org.learnings.payments.paymentservice.services.PaymentGateway;
 import org.learnings.payments.paymentservice.services.PaymentResponseDto;
 import org.learnings.payments.paymentservice.web.controllers.PaymentsController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -35,6 +46,8 @@ public class PaymentsComponentTest {
     private JsonMapper jsonMapper;
     @Autowired
     private TestPaymentRepository repository;
+    @MockitoBean
+    private PaymentGateway paymentGateway;
 
     @Test
     void createPayment_succeeds() throws Exception {
@@ -137,6 +150,46 @@ public class PaymentsComponentTest {
                 .andExpect(status().is(errorStatusCode));
     }
 
+    @Test
+    void executePayment_whenRaceCondition_shouldTriggerLockException() throws ExecutionException, InterruptedException {
+        UUID idempotencyId = UUID.randomUUID();
+        Payment payment = new Payment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId, "pending");
+
+        Payment savedPayment = repository.save(payment);
+        long paymentId = savedPayment.getPaymentId();
+
+        // mock payment gateway in a way to make sure that both threads will reach this point at the same time
+        // this we way we enforce the race condition will 100% happens
+        CountDownLatch ready = new CountDownLatch(2);
+        CountDownLatch start = new CountDownLatch(1);
+        doAnswer(_ -> {
+            ready.countDown();                          // signal arrival
+            start.await(1, TimeUnit.SECONDS);  // wait for release
+            return null;
+        }).when(paymentGateway).executePayment(any());
+        CompletableFuture<MvcResult> firstExecute = CompletableFuture.supplyAsync(performExecute(paymentId));
+        CompletableFuture<MvcResult> secondExecute = CompletableFuture.supplyAsync(performExecute(paymentId));
+
+        // wait until BOTH threads reached the mock
+        ready.await(1, TimeUnit.SECONDS);
+        // release them at the same time
+        start.countDown();
+
+        List<MvcResult> resultActions = firstExecute.thenCombine(secondExecute, List::of).get();
+        List<Integer> resultCodes = resultActions.stream().map(e -> e.getResponse().getStatus()).toList();
+        List<String> resultMessages = resultActions.stream().map(e -> {
+            try {
+                return e.getResponse().getContentAsString();
+            } catch (UnsupportedEncodingException ex) {
+                throw new RuntimeException(ex);
+            }
+        }).toList();
+
+        assertThat(resultCodes).containsExactlyInAnyOrder(200, 409);
+        assertThat(resultMessages).containsExactlyInAnyOrder(
+                "{\"paymentId\":" + savedPayment.getPaymentId() + ",\"status\":\"executed\"}", "");
+    }
+
     public static Stream<Arguments> badRequestsProvider() {
         UUID idempotencyId = UUID.randomUUID();
         return Stream.of(
@@ -150,5 +203,15 @@ public class PaymentsComponentTest {
                 // validate idempotency-id
                 Arguments.of(new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), null, "merch-1", null))
         );
+    }
+
+    private Supplier<MvcResult> performExecute(long paymentId) {
+        return () -> {
+            try {
+                return mockMvc.perform(post("/payments/{paymentId}/execute", paymentId)).andReturn();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 }

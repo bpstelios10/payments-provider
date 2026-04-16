@@ -19,14 +19,16 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentServiceImplTest {
 
     @Mock
     private PaymentRepository paymentRepository;
+    @Mock
+    private PaymentGateway paymentGateway;
     @InjectMocks
     private PaymentServiceImpl paymentService;
 
@@ -111,6 +113,7 @@ class PaymentServiceImplTest {
         Payment mockedPayment = mock(Payment.class);
         when(paymentRepository.findById(paymentId)).thenReturn(Optional.of(mockedPayment));
         when(mockedPayment.getVersion()).thenReturn(version);
+        doNothing().when(paymentGateway).executePayment(any());
         when(paymentRepository.updateIfVersionMatches(paymentId, version, "executed")).thenReturn(1);
 
         PaymentResponseDto paymentResponseDto = paymentService.executePayment(paymentId);
@@ -137,6 +140,7 @@ class PaymentServiceImplTest {
         Payment mockedPayment = mock(Payment.class);
         when(paymentRepository.findById(paymentId)).thenReturn(Optional.of(mockedPayment));
         when(mockedPayment.getVersion()).thenReturn(version);
+        doNothing().when(paymentGateway).executePayment(any());
         when(paymentRepository.updateIfVersionMatches(paymentId, version, "executed")).thenReturn(0);
 
         assertThatThrownBy(() -> paymentService.executePayment(paymentId))
