@@ -1,7 +1,10 @@
 package org.learnings.payments.paymentservice.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -10,7 +13,10 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "payments")
+@Table(name = "payments",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "UNIQUE_IDEMTOTENCY_KEY", columnNames = {"idempotencyKey"})
+        })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for JPA
 @EqualsAndHashCode
