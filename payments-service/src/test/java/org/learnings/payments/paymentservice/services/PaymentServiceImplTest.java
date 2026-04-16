@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -100,5 +102,46 @@ class PaymentServiceImplTest {
 
         assertThat(1L).isEqualTo(resultPaymentId.paymentId());
         assertThat("pending").isEqualTo(resultPaymentId.status());
+    }
+
+    @Test
+    void executePayment_succeeds() {
+        long paymentId = 1L;
+        long version = 0L;
+        Payment mockedPayment = mock(Payment.class);
+        when(paymentRepository.findById(paymentId)).thenReturn(Optional.of(mockedPayment));
+        when(mockedPayment.getVersion()).thenReturn(version);
+        when(paymentRepository.updateIfVersionMatches(paymentId, version, "executed")).thenReturn(1);
+
+        PaymentResponseDto paymentResponseDto = paymentService.executePayment(paymentId);
+
+        assertThat(paymentResponseDto).isNotNull();
+        assertThat(1L).isEqualTo(paymentResponseDto.paymentId());
+        assertThat("executed").isEqualTo(paymentResponseDto.status());
+    }
+
+    @Test
+    void executePayment_whenPaymentNotFound_returnsNotFound() {
+        long paymentId = 1L;
+        when(paymentRepository.findById(paymentId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> paymentService.executePayment(paymentId))
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessage("404 NOT_FOUND \"Payment with id [" + paymentId + "] does not exist\"");
+    }
+
+    @Test
+    void executePayment_whenPaymentAlreadyUpdated_throwsException() {
+        long paymentId = 1L;
+        long version = 0L;
+        Payment mockedPayment = mock(Payment.class);
+        when(paymentRepository.findById(paymentId)).thenReturn(Optional.of(mockedPayment));
+        when(mockedPayment.getVersion()).thenReturn(version);
+        when(paymentRepository.updateIfVersionMatches(paymentId, version, "executed")).thenReturn(0);
+
+        assertThatThrownBy(() -> paymentService.executePayment(paymentId))
+                .isInstanceOf(ObjectOptimisticLockingFailureException.class)
+                .hasMessage("Object of class [org.learnings.payments.paymentservice.domain.Payment] with identifier " +
+                        "[1]: optimistic locking failed");
     }
 }

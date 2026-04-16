@@ -43,4 +43,6 @@ public class Payment {
     private Instant createdDate;
     @UpdateTimestamp
     private Instant updatedDate;
+    @Version
+    private Long version;
 }

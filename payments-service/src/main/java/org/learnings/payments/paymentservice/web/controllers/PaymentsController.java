@@ -9,10 +9,7 @@ import org.learnings.payments.paymentservice.services.PaymentDto;
 import org.learnings.payments.paymentservice.services.PaymentResponseDto;
 import org.learnings.payments.paymentservice.services.PaymentService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -34,11 +31,10 @@ public class PaymentsController {
         return ResponseEntity.ok(paymentService.createPayment(paymentDto));
     }
 
-//    @PostMapping("/execute")
-//    public ResponseEntity<PaymentResponseDto> executePayment(@NotEmpty String paymentId) {
-//
-//        return ResponseEntity.ok(paymentService.createPayment(paymentDto).toString());
-//    }
+    @PostMapping("/{paymentId}/execute")
+    public ResponseEntity<PaymentResponseDto> executePayment(@PathVariable Long paymentId) {
+        return ResponseEntity.ok(paymentService.executePayment(paymentId));
+    }
 
     public record CreatePayment(
             @NotNull

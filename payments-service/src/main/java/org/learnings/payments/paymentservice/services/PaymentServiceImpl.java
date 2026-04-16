@@ -5,9 +5,13 @@ import org.learnings.payments.paymentservice.domain.Payment;
 import org.learnings.payments.paymentservice.repositories.PaymentRepository;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
+
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j
 @Service
@@ -29,10 +33,32 @@ public class PaymentServiceImpl implements PaymentService {
 
             log.debug("payment with id [{}] created at [{}]", savedPayment.getPaymentId(), savedPayment.getCreatedDate());
 
-            return new PaymentResponseDto(savedPayment.getPaymentId(), savedPayment.getStatus());
+            return PaymentResponseDto.fromPayment(savedPayment);
         } catch (DataAccessException dae) {
             return getTransactionIdWhenIsRetry(paymentDto, dae);
         }
+    }
+
+    // This method is not annotated as transactional cause the rest call will keep it open for a long time
+    // so we need to manually check the version for conflicts
+    @Override
+    public PaymentResponseDto executePayment(long paymentId) {
+        Optional<Payment> payment = paymentRepository.findById(paymentId);
+        long version = payment
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Payment with id [" + paymentId + "] does not exist"))
+                .getVersion();
+
+        // there will be some call to a third party here
+        // bankIssuer.executePayment(toBankRequest(payment));
+        // then handle response and if ok update the status:
+
+        int updated = paymentRepository.updateIfVersionMatches(paymentId, version, "executed");
+
+        if (updated == 0) {
+            throw new ObjectOptimisticLockingFailureException(Payment.class, paymentId);
+        }
+
+        return new PaymentResponseDto(paymentId, "executed");
     }
 
 //    This is needed because the initial transaction will be marked as dirty. but the previous transaction turns

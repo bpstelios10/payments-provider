@@ -3,6 +3,7 @@ package org.learnings.payments.paymentservice.componenttests;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.learnings.payments.paymentservice.domain.Payment;
@@ -65,9 +66,9 @@ public class PaymentsComponentTest {
                 new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId);
 
         mockMvc.perform(
-                post("/payments")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.writeValueAsString(requestBody)))
+                        post("/payments")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonMapper.writeValueAsString(requestBody)))
                 .andExpect(status().isOk());
 
 
@@ -87,6 +88,53 @@ public class PaymentsComponentTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(jsonMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void executePayment_succeeds() throws Exception {
+        UUID idempotencyId = UUID.randomUUID();
+        PaymentsController.CreatePayment requestBody =
+                new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId);
+
+        MvcResult mvcResult = mockMvc.perform(
+                        post("/payments")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        PaymentResponseDto paymentResponseDto = jsonMapper.readValue(contentAsString, PaymentResponseDto.class);
+        assertThat(paymentResponseDto).isNotNull();
+        assertThat(paymentResponseDto.status()).isEqualTo("pending");
+
+        Long createdPaymentId = paymentResponseDto.paymentId();
+
+        MvcResult mvcResultExecute = mockMvc.perform(post("/payments/{paymentId}/execute", createdPaymentId))
+                .andExpect(status().isOk())
+                .andReturn();
+        contentAsString = mvcResultExecute.getResponse().getContentAsString();
+        paymentResponseDto = jsonMapper.readValue(contentAsString, PaymentResponseDto.class);
+        assertThat(paymentResponseDto).isNotNull();
+        assertThat(paymentResponseDto.status()).isEqualTo("executed");
+
+        Payment byPaymentId = repository.findByPaymentId(createdPaymentId);
+        assertThat("merch-1").isEqualTo(byPaymentId.getMerchantId());
+        assertThat("executed").isEqualTo(byPaymentId.getStatus());
+        assertThat(byPaymentId.getCreatedDate()).isNotEqualTo(byPaymentId.getUpdatedDate());
+        assertThat(byPaymentId.getVersion()).isGreaterThan(0);
+    }
+
+    @Test
+    void executePayment_whenNotExistedPayment_throwsNotFound() throws Exception {
+        mockMvc.perform(post("/payments/{paymentId}/execute", 185723482357L))
+                .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"'',404", "' ',400"})
+    void executePayment_whenInvalidInput_throwsBadRequest(String paymentId, int errorStatusCode) throws Exception {
+        mockMvc.perform(post("/payments/{paymentId}/execute", paymentId))
+                .andExpect(status().is(errorStatusCode));
     }
 
     public static Stream<Arguments> badRequestsProvider() {
