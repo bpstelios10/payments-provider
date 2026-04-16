@@ -60,4 +60,19 @@ class PaymentsControllerTest {
         assertThat(response.getBody().paymentId()).isEqualTo(1L);
         assertThat(response.getBody().status()).isEqualTo("pending");
     }
+
+    @Test
+    void executePayment_succeeds() {
+        long paymentId = 1L;
+        PaymentResponseDto executedPayment = new PaymentResponseDto(paymentId, "executed");
+        when(paymentService.executePayment(paymentId)).thenReturn(executedPayment);
+
+        ResponseEntity<PaymentResponseDto> response = paymentsController.executePayment(paymentId);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().paymentId()).isEqualTo(1L);
+        assertThat(response.getBody().status()).isEqualTo("executed");
+    }
 }
