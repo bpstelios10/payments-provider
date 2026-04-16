@@ -23,10 +23,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -158,36 +155,38 @@ public class PaymentsComponentTest {
         Payment savedPayment = repository.save(payment);
         long paymentId = savedPayment.getPaymentId();
 
-        // mock payment gateway in a way to make sure that both threads will reach this point at the same time
-        // this we way we enforce the race condition will 100% happens
-        CountDownLatch ready = new CountDownLatch(2);
-        CountDownLatch start = new CountDownLatch(1);
-        doAnswer(_ -> {
-            ready.countDown();                          // signal arrival
-            start.await(1, TimeUnit.SECONDS);  // wait for release
-            return null;
-        }).when(paymentGateway).executePayment(any());
-        CompletableFuture<MvcResult> firstExecute = CompletableFuture.supplyAsync(performExecute(paymentId));
-        CompletableFuture<MvcResult> secondExecute = CompletableFuture.supplyAsync(performExecute(paymentId));
+        try (ExecutorService executor =  Executors.newFixedThreadPool(2)) {
+            // mock payment gateway in a way to make sure that both threads will reach this point at the same time
+            // this we way we enforce the race condition will 100% happens
+            CountDownLatch ready = new CountDownLatch(2);
+            CountDownLatch start = new CountDownLatch(1);
+            doAnswer(_ -> {
+                ready.countDown();                          // signal arrival
+                start.await(1, TimeUnit.SECONDS);  // wait for release
+                return null;
+            }).when(paymentGateway).executePayment(any());
+            CompletableFuture<MvcResult> firstExecute = CompletableFuture.supplyAsync(performExecute(paymentId), executor);
+            CompletableFuture<MvcResult> secondExecute = CompletableFuture.supplyAsync(performExecute(paymentId), executor);
 
-        // wait until BOTH threads reached the mock
-        ready.await(1, TimeUnit.SECONDS);
-        // release them at the same time
-        start.countDown();
+            // wait until BOTH threads reached the mock
+            ready.await(1, TimeUnit.SECONDS);
+            // release them at the same time
+            start.countDown();
 
-        List<MvcResult> resultActions = firstExecute.thenCombine(secondExecute, List::of).get();
-        List<Integer> resultCodes = resultActions.stream().map(e -> e.getResponse().getStatus()).toList();
-        List<String> resultMessages = resultActions.stream().map(e -> {
-            try {
-                return e.getResponse().getContentAsString();
-            } catch (UnsupportedEncodingException ex) {
-                throw new RuntimeException(ex);
-            }
-        }).toList();
+            List<MvcResult> resultActions = firstExecute.thenCombine(secondExecute, List::of).get();
+            List<Integer> resultCodes = resultActions.stream().map(e -> e.getResponse().getStatus()).toList();
+            List<String> resultMessages = resultActions.stream().map(e -> {
+                try {
+                    return e.getResponse().getContentAsString();
+                } catch (UnsupportedEncodingException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }).toList();
 
-        assertThat(resultCodes).containsExactlyInAnyOrder(200, 409);
-        assertThat(resultMessages).containsExactlyInAnyOrder(
-                "{\"paymentId\":" + savedPayment.getPaymentId() + ",\"status\":\"executed\"}", "");
+            assertThat(resultCodes).containsExactlyInAnyOrder(200, 409);
+            assertThat(resultMessages).containsExactlyInAnyOrder(
+                    "{\"paymentId\":" + savedPayment.getPaymentId() + ",\"status\":\"executed\"}", "");
+        }
     }
 
     public static Stream<Arguments> badRequestsProvider() {
