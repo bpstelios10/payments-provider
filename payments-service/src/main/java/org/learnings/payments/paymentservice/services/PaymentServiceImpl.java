@@ -18,9 +18,11 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final PaymentGateway paymentGateway;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentGateway paymentGateway) {
         this.paymentRepository = paymentRepository;
+        this.paymentGateway = paymentGateway;
     }
 
     @Override
@@ -48,9 +50,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Payment with id [" + paymentId + "] does not exist"))
                 .getVersion();
 
-        // there will be some call to a third party here
-        // bankIssuer.executePayment(toBankRequest(payment));
-        // then handle response and if ok update the status:
+        paymentGateway.executePayment(PaymentDto.fromPayment(payment.get()));
 
         int updated = paymentRepository.updateIfVersionMatches(paymentId, version, "executed");
 

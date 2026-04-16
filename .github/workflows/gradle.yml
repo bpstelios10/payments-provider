@@ -28,7 +28,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Build with Local Gradle Wrapper
-        run: ./gradlew build
+        run: ./gradlew build # add -i for debug logs, in case of build failures
 
 #  dependency-submission:
 #

@@ -10,4 +10,8 @@ public record PaymentDto(BigDecimal amount, String currency, String merchantId, 
     static Payment toPayment(PaymentDto paymentDto, String status) {
         return new Payment(paymentDto.amount, paymentDto.currency, paymentDto.merchantId, paymentDto.idempotencyKey, status);
     }
+
+    static PaymentDto fromPayment(Payment payment) {
+        return new PaymentDto(payment.getAmount(), payment.getCurrency(), payment.getMerchantId(), payment.getIdempotencyKey());
+    }
 }
