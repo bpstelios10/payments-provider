@@ -3,6 +3,7 @@ package org.learnings.payments.paymentservice.web.controllers;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.learnings.payments.paymentservice.services.PaymentDto;
+import org.learnings.payments.paymentservice.services.PaymentResponseDto;
 import org.learnings.payments.paymentservice.services.PaymentService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -30,13 +31,16 @@ class PaymentsControllerTest {
         PaymentsController.CreatePayment requestBody =
                 new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId);
         PaymentDto paymentDto = new PaymentDto(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId);
-        when(paymentService.createPayment(paymentDto)).thenReturn(1L);
+        PaymentResponseDto savedPayment = new PaymentResponseDto(1L, "pending");
+        when(paymentService.createPayment(paymentDto)).thenReturn(savedPayment);
 
-        ResponseEntity<String> response = paymentsController.createPayment(requestBody);
+        ResponseEntity<PaymentResponseDto> response = paymentsController.createPayment(requestBody);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo("1");
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().paymentId()).isEqualTo(1L);
+        assertThat(response.getBody().status()).isEqualTo("pending");
     }
 
     @Test
@@ -45,12 +49,15 @@ class PaymentsControllerTest {
         PaymentsController.CreatePayment requestBody =
                 new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), null, "merch-1", idempotencyId);
         PaymentDto paymentDto = new PaymentDto(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId);
-        when(paymentService.createPayment(paymentDto)).thenReturn(1L);
+        PaymentResponseDto savedPayment = new PaymentResponseDto(1L, "pending");
+        when(paymentService.createPayment(paymentDto)).thenReturn(savedPayment);
 
-        ResponseEntity<String> response = paymentsController.createPayment(requestBody);
+        ResponseEntity<PaymentResponseDto> response = paymentsController.createPayment(requestBody);
 
         assertThat(response).isNotNull();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo("1");
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().paymentId()).isEqualTo(1L);
+        assertThat(response.getBody().status()).isEqualTo("pending");
     }
 }

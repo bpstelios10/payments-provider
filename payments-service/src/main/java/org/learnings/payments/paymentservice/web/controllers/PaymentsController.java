@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.learnings.payments.paymentservice.services.PaymentDto;
+import org.learnings.payments.paymentservice.services.PaymentResponseDto;
 import org.learnings.payments.paymentservice.services.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,11 +28,17 @@ public class PaymentsController {
     }
 
     @PostMapping
-    public ResponseEntity<String> createPayment(@Valid @NotNull @RequestBody CreatePayment requestBody) {
+    public ResponseEntity<PaymentResponseDto> createPayment(@Valid @NotNull @RequestBody CreatePayment requestBody) {
         PaymentDto paymentDto = CreatePayment.toPaymentDto(requestBody);
 
-        return ResponseEntity.ok(paymentService.createPayment(paymentDto).toString());
+        return ResponseEntity.ok(paymentService.createPayment(paymentDto));
     }
+
+//    @PostMapping("/execute")
+//    public ResponseEntity<PaymentResponseDto> executePayment(@NotEmpty String paymentId) {
+//
+//        return ResponseEntity.ok(paymentService.createPayment(paymentDto).toString());
+//    }
 
     public record CreatePayment(
             @NotNull

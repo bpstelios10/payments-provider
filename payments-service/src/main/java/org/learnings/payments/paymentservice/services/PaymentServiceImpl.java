@@ -21,7 +21,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
 //    @Transactional
-    public Long createPayment(PaymentDto paymentDto) {
+    public PaymentResponseDto createPayment(PaymentDto paymentDto) {
         Payment payment = PaymentDto.toPayment(paymentDto, "pending");
 
         try {
@@ -29,7 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
 
             log.debug("payment with id [{}] created at [{}]", savedPayment.getPaymentId(), savedPayment.getCreatedDate());
 
-            return savedPayment.getPaymentId();
+            return new PaymentResponseDto(savedPayment.getPaymentId(), savedPayment.getStatus());
         } catch (DataAccessException dae) {
             return getTransactionIdWhenIsRetry(paymentDto, dae);
         }
@@ -38,12 +38,12 @@ public class PaymentServiceImpl implements PaymentService {
 //    This is needed because the initial transaction will be marked as dirty. but the previous transaction turns
 //    the whole class as a proxy. so the next lines need to go to some utility class. then this Transactional will work
 //    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    private Long getTransactionIdWhenIsRetry(PaymentDto paymentDto, DataAccessException dae) {
+    private PaymentResponseDto getTransactionIdWhenIsRetry(PaymentDto paymentDto, DataAccessException dae) {
         if (dae instanceof DataIntegrityViolationException && dae.getMessage().contains("UNIQUE_IDEMTOTENCY_KEY")) {
             Optional<Payment> byIdempotencyKey = paymentRepository.findByIdempotencyKey(paymentDto.idempotencyKey());
 
             if (byIdempotencyKey.isPresent()) {
-                return byIdempotencyKey.get().getPaymentId();
+                return new PaymentResponseDto(byIdempotencyKey.get().getPaymentId(), byIdempotencyKey.get().getStatus());
             }
         }
 
