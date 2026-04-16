@@ -35,11 +35,13 @@ class PaymentServiceImplTest {
         Payment savedPayment = mock(Payment.class);
         when(paymentRepository.save(payment)).thenReturn(savedPayment);
         when(savedPayment.getPaymentId()).thenReturn(1L);
+        when(savedPayment.getStatus()).thenReturn("pending");
         when(savedPayment.getCreatedDate()).thenReturn(Instant.now());
 
-        Long resultPaymentId = paymentService.createPayment(dto);
+        PaymentResponseDto resultPaymentId = paymentService.createPayment(dto);
 
-        assertThat(1L).isEqualTo(resultPaymentId);
+        assertThat(1L).isEqualTo(resultPaymentId.paymentId());
+        assertThat("pending").isEqualTo(resultPaymentId.status());
     }
 
     @Test
@@ -91,10 +93,12 @@ class PaymentServiceImplTest {
         when(paymentRepository.save(payment)).thenThrow(dataIntegrityViolationException);
         Payment existingPayment = mock(Payment.class);
         when(existingPayment.getPaymentId()).thenReturn(1L);
+        when(existingPayment.getStatus()).thenReturn("pending");
         when(paymentRepository.findByIdempotencyKey(idempotencyKey)).thenReturn(Optional.of(existingPayment));
 
-        Long resultPaymentId = paymentService.createPayment(dto);
+        PaymentResponseDto resultPaymentId = paymentService.createPayment(dto);
 
-        assertThat(1L).isEqualTo(resultPaymentId);
+        assertThat(1L).isEqualTo(resultPaymentId.paymentId());
+        assertThat("pending").isEqualTo(resultPaymentId.status());
     }
 }

@@ -6,6 +6,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.learnings.payments.paymentservice.domain.Payment;
+import org.learnings.payments.paymentservice.services.PaymentResponseDto;
 import org.learnings.payments.paymentservice.web.controllers.PaymentsController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,8 +50,11 @@ public class PaymentsComponentTest {
         assertThat(mvcResult).isNotNull();
         assertThat(mvcResult.getResponse()).isNotNull();
         String contentAsString = mvcResult.getResponse().getContentAsString();
-        Payment byPaymentId = repository.findByPaymentId(Long.parseLong(contentAsString));
+        PaymentResponseDto paymentResponseDto = jsonMapper.readValue(contentAsString, PaymentResponseDto.class);
+        assertThat(paymentResponseDto).isNotNull();
+        assertThat(paymentResponseDto.status()).isEqualTo("pending");
 
+        Payment byPaymentId = repository.findByPaymentId(paymentResponseDto.paymentId());
         assertThat("merch-1").isEqualTo(byPaymentId.getMerchantId());
     }
 
