@@ -21,11 +21,11 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-public class PaymentsErrorsComponentTest {
+public class PaymentsComponentTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,10 +46,32 @@ public class PaymentsErrorsComponentTest {
                                 .content(jsonMapper.writeValueAsString(requestBody)))
                 .andReturn();
 
+        assertThat(mvcResult).isNotNull();
+        assertThat(mvcResult.getResponse()).isNotNull();
         String contentAsString = mvcResult.getResponse().getContentAsString();
         Payment byPaymentId = repository.findByPaymentId(Long.parseLong(contentAsString));
 
         assertThat("merch-1").isEqualTo(byPaymentId.getMerchantId());
+    }
+
+    @Test
+    void createPayment_whenSameIdempotencyKey_avoidsRetryByReturningExistingPayment() throws Exception {
+        UUID idempotencyId = UUID.randomUUID();
+        PaymentsController.CreatePayment requestBody =
+                new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId);
+
+        mockMvc.perform(
+                post("/payments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isOk());
+
+
+        mockMvc.perform(
+                        post("/payments")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isOk());
     }
 
     @ParameterizedTest
