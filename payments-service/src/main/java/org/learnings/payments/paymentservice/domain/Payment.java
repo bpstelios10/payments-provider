@@ -15,6 +15,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "payments",
         uniqueConstraints = {
+                // for very defensive coding, we need the (id-key, the payment-id) to be unique
                 @UniqueConstraint(name = "UNIQUE_IDEMTOTENCY_KEY", columnNames = {"idempotencyKey"})
         })
 @Getter
@@ -22,7 +23,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 public class Payment {
 
-    public Payment(BigDecimal amount, String currency, String merchantId, UUID idempotencyKey, String status) {
+    public Payment(BigDecimal amount, String currency, String merchantId, UUID idempotencyKey, PaymentStatus status) {
         this.amount = amount;
         this.currency = currency;
         this.merchantId = merchantId;
@@ -38,11 +39,10 @@ public class Payment {
     private String currency;
     private String merchantId;
     private UUID idempotencyKey;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
     @CreationTimestamp
     private Instant createdDate;
     @UpdateTimestamp
     private Instant updatedDate;
-    @Version
-    private Long version;
 }

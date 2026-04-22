@@ -5,16 +5,16 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import org.learnings.payments.paymentservice.services.PaymentDto;
-import org.learnings.payments.paymentservice.services.PaymentResponseDto;
+import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.learnings.payments.paymentservice.services.PaymentService;
-import org.springframework.http.HttpStatus;
+import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+
+import static org.learnings.payments.paymentservice.web.controllers.PaymentsController.PaymentResponse.fromPaymentDto;
 
 @RestController
 @RequestMapping("payments")
@@ -27,20 +27,20 @@ public class PaymentsController {
     }
 
     @PostMapping
-    public ResponseEntity<PaymentResponseDto> createPayment(@Valid @NotNull @RequestBody CreatePayment requestBody) {
+    public ResponseEntity<PaymentResponse> createPayment(@Valid @NotNull @RequestBody CreatePayment requestBody) {
         PaymentDto paymentDto = CreatePayment.toPaymentDto(requestBody);
 
-        return ResponseEntity.ok(paymentService.createPayment(paymentDto));
+        PaymentDto responseDto = paymentService.createPayment(paymentDto);
+
+        return ResponseEntity.ok(fromPaymentDto(responseDto));
     }
 
     @PostMapping("/{paymentId}/execute")
-    public ResponseEntity<PaymentResponseDto> executePayment(@PathVariable Long paymentId) {
-        return ResponseEntity.ok(paymentService.executePayment(paymentId));
-    }
+    public ResponseEntity<PaymentResponse> executePayment(@PathVariable Long paymentId) {
+        PaymentDto responseDto = paymentService.executePayment(paymentId);
 
-    @ResponseStatus(value=HttpStatus.CONFLICT, reason="Race condition error")
-    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
-    public void conflict() { }
+        return ResponseEntity.ok(fromPaymentDto(responseDto));
+    }
 
     public record CreatePayment(
             @NotNull
@@ -55,7 +55,13 @@ public class PaymentsController {
         static PaymentDto toPaymentDto(CreatePayment requestBody) {
             // TODO should be checking not empty, not just null
             String currency = requestBody.currency == null ? "USD" : requestBody.currency;
-            return new PaymentDto(requestBody.amount, currency, requestBody.merchantId, requestBody.idempotencyKey);
+            return new PaymentDto(requestBody.amount, currency, requestBody.merchantId, requestBody.idempotencyKey, null);
+        }
+    }
+
+    public record PaymentResponse(Long paymentId, PaymentStatus status) {
+        static PaymentResponse fromPaymentDto(PaymentDto paymentDto) {
+            return new PaymentResponse(paymentDto.getPaymentId(), paymentDto.getStatus());
         }
     }
 }
