@@ -21,16 +21,20 @@ import tools.jackson.databind.json.JsonMapper;
 
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.util.List;
+import java.util.ServiceConfigurationError;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -122,7 +126,33 @@ public class PaymentsComponentTest {
 
         Payment byPaymentId = repository.findByPaymentId(paymentId);
         assertThat("merch-1").isEqualTo(byPaymentId.getMerchantId());
-        assertThat(PaymentStatus.INITIATED).isNotEqualTo(byPaymentId.getStatus());
+        assertThat(PaymentStatus.CAPTURED).isEqualTo(byPaymentId.getStatus());
+        assertThat(byPaymentId.getCreatedDate()).isNotEqualTo(byPaymentId.getUpdatedDate());
+    }
+
+    @Test
+    void executePayment_whenGatewayFails_succeedsWithFailedStatus() throws Exception {
+        UUID idempotencyId = UUID.randomUUID();
+        Payment payment = new Payment(
+                BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId, PaymentStatus.INITIATED);
+
+        Payment savedPayment = repository.save(payment);
+        long paymentId = savedPayment.getPaymentId();
+
+        doThrow(new RuntimeException("gateway error")).when(paymentGateway).executePayment(any(), eq(idempotencyId));
+
+        MvcResult mvcResultExecute = mockMvc.perform(post("/payments/{paymentId}/execute", paymentId))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResultExecute.getResponse().getContentAsString();
+        PaymentsController.PaymentResponse paymentResponseDto =
+                jsonMapper.readValue(contentAsString, PaymentsController.PaymentResponse.class);
+        assertThat(paymentResponseDto).isNotNull();
+        assertThat(paymentResponseDto.status()).isEqualTo(PaymentStatus.FAILED);
+
+        Payment byPaymentId = repository.findByPaymentId(paymentId);
+        assertThat("merch-1").isEqualTo(byPaymentId.getMerchantId());
+        assertThat(PaymentStatus.FAILED).isEqualTo(byPaymentId.getStatus());
         assertThat(byPaymentId.getCreatedDate()).isNotEqualTo(byPaymentId.getUpdatedDate());
     }
 
@@ -139,47 +169,108 @@ public class PaymentsComponentTest {
                 .andExpect(status().is(errorStatusCode));
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
+    /*
+     * This test uses 3 threads to make the same request. we know that only 1 should enter the 'Processing' status
+     * So we use a count-down-latch and we tell the threads 'when you finish execution, countdown'. We also put the
+     * latch.wait in the mocked payment-gateway call. So the 1 thread that enters processing status, waits till the 2
+     * other threads return quickly (with 409 status, lock-exception). and then it continues.
+     * In the end we verify the response codes are 200, 409 and 409
+     */
     @Test
     void executePayment_whenRaceCondition_shouldTriggerLockException() throws ExecutionException, InterruptedException {
         UUID idempotencyId = UUID.randomUUID();
         Payment payment = new Payment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId, PaymentStatus.INITIATED);
+        List<MvcResult> resultActions;
 
+        // create the payment in the DB
         Payment savedPayment = repository.save(payment);
         long paymentId = savedPayment.getPaymentId();
 
-        try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
-            // mock payment gateway in a way to make sure that both threads will reach this point at the same time
-            // this we way we enforce the race condition will 100% happens
-            CountDownLatch ready = new CountDownLatch(2);
-            CountDownLatch start = new CountDownLatch(1);
-            doAnswer(_ -> {
-                ready.countDown();                          // signal arrival
-                start.await(1, TimeUnit.SECONDS);  // wait for release
-                return null;
-            }).when(paymentGateway).executePayment(any(), eq(idempotencyId));
-            CompletableFuture<MvcResult> firstExecute = CompletableFuture.supplyAsync(performExecute(paymentId), executor);
-            CompletableFuture<MvcResult> secondExecute = CompletableFuture.supplyAsync(performExecute(paymentId), executor);
+        // set up the payment gateway mock to handle the latch
+        CountDownLatch lockedOutThread = new CountDownLatch(2);
+        doAnswer(_ -> {
+            System.out.println("##### [" + Thread.currentThread().getName() + "] - inside payment-gateway");
+            // wait till the locked-out threads finish
+            boolean isLockCountDownReached = lockedOutThread.await(1, TimeUnit.SECONDS);
+            assertThat(isLockCountDownReached).isTrue();
+            System.out.println("##### [" + Thread.currentThread().getName() + "] - continue after payment-gateway");
+            return null;
+        }).when(paymentGateway).executePayment(any(), eq(idempotencyId));
 
-            // wait until BOTH threads reached the mock
-            ready.await(1, TimeUnit.SECONDS);
-            // release them at the same time
-            start.countDown();
+        // run the threads in parallel and block for results
+        try (ExecutorService executor = Executors.newFixedThreadPool(3)) {
+            CompletableFuture<MvcResult> firstExecute = CompletableFuture.supplyAsync(performExecute(paymentId, lockedOutThread), executor);
+            CompletableFuture<MvcResult> secondExecute = CompletableFuture.supplyAsync(performExecute(paymentId, lockedOutThread), executor);
+            CompletableFuture<MvcResult> thirdExecute = CompletableFuture.supplyAsync(performExecute(paymentId, lockedOutThread), executor);
 
-            List<MvcResult> resultActions = firstExecute.thenCombine(secondExecute, List::of).get();
-            List<Integer> resultCodes = resultActions.stream().map(e -> e.getResponse().getStatus()).toList();
-            List<String> resultMessages = resultActions.stream().map(e -> {
-                try {
-                    return e.getResponse().getContentAsString();
-                } catch (UnsupportedEncodingException ex) {
-                    throw new RuntimeException(ex);
-                }
-            }).toList();
-
-            assertThat(resultCodes).containsExactlyInAnyOrder(200, 409);
-            assertThat(resultMessages).containsExactlyInAnyOrder(
-                    "{\"paymentId\":" + savedPayment.getPaymentId() + ",\"status\":\"CAPTURED\"}", "");
+            System.out.println("##### [" + Thread.currentThread().getName() + "] - before blocking the futures");
+            CompletableFuture<Void> all = CompletableFuture.allOf(firstExecute, secondExecute, thirdExecute);
+            all.get();
+            resultActions = List.of(firstExecute.get(), secondExecute.get(), thirdExecute.get());
         }
+
+        // assert responses
+        List<Integer> resultCodes = resultActions.stream().map(e -> e.getResponse().getStatus()).toList();
+        List<String> resultMessages = resultActions.stream().map(e -> {
+            try {
+                return e.getResponse().getContentAsString();
+            } catch (UnsupportedEncodingException ex) {
+                throw new RuntimeException(ex);
+            }
+        }).toList();
+        assertThat(resultCodes).containsExactlyInAnyOrder(200, 409, 409);
+        assertThat(resultMessages).containsExactlyInAnyOrder(
+                "{\"paymentId\":" + savedPayment.getPaymentId() + ",\"status\":\"CAPTURED\"}", "", "");
+
+        // assert actual database impact
+        Payment capturedPayment = repository.findByPaymentId(paymentId);
+        assertThat(PaymentStatus.CAPTURED).isEqualTo(capturedPayment.getStatus());
+        assertThat(capturedPayment.getCreatedDate()).isBefore(capturedPayment.getProcessingStartedAt());
+        assertThat(capturedPayment.getProcessingStartedAt()).isBefore(capturedPayment.getUpdatedDate());
+    }
+
+    @Test
+    void executePayment_whenProcessingThreadFailsAndTimeoutPeriodPasses_thenNextThreadFinishesProcessing() throws Exception {
+        UUID idempotencyId = UUID.randomUUID();
+        Payment payment = new Payment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId, PaymentStatus.INITIATED);
+
+        // create the payment in the DB
+        Payment savedPayment = repository.save(payment);
+        long paymentId = savedPayment.getPaymentId();
+
+        // first attempt should fail, but second should pass
+        doThrow(new ServiceConfigurationError("boom"))
+                .doNothing()
+                .when(paymentGateway)
+                .executePayment(any(), eq(idempotencyId));
+
+        // FIRST ATTEMPT
+        mockMvc.perform(post("/payments/{paymentId}/execute", paymentId))
+                .andExpect(status().isInternalServerError());
+
+        // assert actual database impact
+        Payment capturedPayment = repository.findByPaymentId(paymentId);
+        assertThat(PaymentStatus.PROCESSING).isEqualTo(capturedPayment.getStatus());
+        assertThat(capturedPayment.getProcessingStartedAt()).isNotNull();
+        assertThat(capturedPayment.getCreatedDate()).isBefore(capturedPayment.getProcessingStartedAt());
+
+        // wait for processing timeout to pass
+        sleep(Duration.ofSeconds(11)); // TODO make this configurable for tests
+
+        // SECOND ATTEMPT
+        MvcResult mvcResultExecute = mockMvc.perform(post("/payments/{paymentId}/execute", paymentId))
+                .andExpect(status().isOk())
+                .andReturn();
+        String contentAsString = mvcResultExecute.getResponse().getContentAsString();
+        PaymentsController.PaymentResponse paymentResponseDto =
+                jsonMapper.readValue(contentAsString, PaymentsController.PaymentResponse.class);
+        assertThat(paymentResponseDto).isNotNull();
+        assertThat(paymentResponseDto.status()).isEqualTo(PaymentStatus.CAPTURED);
+
+        Payment byPaymentId = repository.findByPaymentId(paymentId);
+        assertThat("merch-1").isEqualTo(byPaymentId.getMerchantId());
+        assertThat(PaymentStatus.INITIATED).isNotEqualTo(byPaymentId.getStatus());
+        assertThat(byPaymentId.getCreatedDate()).isNotEqualTo(byPaymentId.getUpdatedDate());
     }
 
     public static Stream<Arguments> badRequestsProvider() {
@@ -197,10 +288,15 @@ public class PaymentsComponentTest {
         );
     }
 
-    private Supplier<MvcResult> performExecute(long paymentId) {
+    private Supplier<MvcResult> performExecute(long paymentId, CountDownLatch lockedOutThread) {
         return () -> {
             try {
-                return mockMvc.perform(post("/payments/{paymentId}/execute", paymentId)).andReturn();
+                System.out.println("##### [" + Thread.currentThread().getName() + "] - starting");
+                MvcResult mvcResult = mockMvc.perform(post("/payments/{paymentId}/execute", paymentId)).andReturn();
+                // count down only after return. so the locked-out threads that fail-fast will be taken into account
+                lockedOutThread.countDown();
+
+                return mvcResult;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

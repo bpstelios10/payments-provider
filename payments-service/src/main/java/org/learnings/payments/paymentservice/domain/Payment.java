@@ -42,6 +42,8 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
     @SuppressWarnings({"UnusedDeclaration"})
+    private Instant processingStartedAt;
+    @SuppressWarnings({"UnusedDeclaration"})
     @CreationTimestamp
     private Instant createdDate;
     @SuppressWarnings({"UnusedDeclaration"})
