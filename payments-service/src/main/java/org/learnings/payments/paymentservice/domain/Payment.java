@@ -41,8 +41,10 @@ public class Payment {
     private UUID idempotencyKey;
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
+    @SuppressWarnings({"UnusedDeclaration"})
     @CreationTimestamp
     private Instant createdDate;
+    @SuppressWarnings({"UnusedDeclaration"})
     @UpdateTimestamp
     private Instant updatedDate;
 }

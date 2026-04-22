@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
@@ -117,15 +118,15 @@ class PaymentServiceImplTest {
         Payment mockedPayment = getMockedPayment(paymentId, idempotencyKey);
         when(mockedPayment.getStatus()).thenReturn(PaymentStatus.INITIATED).thenReturn(CAPTURED);
         when(paymentRepository.findById(paymentId)).thenReturn(Optional.of(mockedPayment));
+        when(paymentRepository.setStatusIfCurrentStatusIs(paymentId, PROCESSING, INITIATED)).thenReturn(1);
+        when(paymentRepository.setStatusIfCurrentStatusIs(paymentId, CAPTURED, PROCESSING)).thenReturn(1);
 
         PaymentDto responsePaymentDto = paymentService.executePayment(paymentId);
 
         assertThat(responsePaymentDto).isNotNull();
         assertThat(1L).isEqualTo(responsePaymentDto.getPaymentId());
         assertThat(PaymentStatus.CAPTURED).isEqualTo(responsePaymentDto.getStatus());
-        verify(paymentRepository).setStatusIfCurrentStatusIs(paymentId, PROCESSING, INITIATED);
         verify(paymentGateway).executePayment(any(PaymentDto.class), eq(idempotencyKey));
-        verify(paymentRepository).setStatusIfCurrentStatusIs(paymentId, CAPTURED, PROCESSING);
         verifyNoMoreInteractions(paymentRepository, paymentGateway);
     }
 
@@ -165,6 +166,8 @@ class PaymentServiceImplTest {
         Payment mockedPayment = getMockedPayment(paymentId, idempotencyKey);
         when(mockedPayment.getStatus()).thenReturn(PaymentStatus.INITIATED).thenReturn(FAILED);
         when(paymentRepository.findById(paymentId)).thenReturn(Optional.of(mockedPayment));
+        when(paymentRepository.setStatusIfCurrentStatusIs(paymentId, PROCESSING, INITIATED)).thenReturn(1);
+        when(paymentRepository.setStatusIfCurrentStatusIs(paymentId, FAILED, PROCESSING)).thenReturn(1);
         doThrow(new RuntimeException("something went wrong"))
                 .when(paymentGateway).executePayment(any(PaymentDto.class), eq(idempotencyKey));
 
@@ -173,8 +176,25 @@ class PaymentServiceImplTest {
         assertThat(responsePaymentDto).isNotNull();
         assertThat(1L).isEqualTo(responsePaymentDto.getPaymentId());
         assertThat(PaymentStatus.FAILED).isEqualTo(responsePaymentDto.getStatus());
-        verify(paymentRepository).setStatusIfCurrentStatusIs(paymentId, PROCESSING, INITIATED);
-        verify(paymentRepository).setStatusIfCurrentStatusIs(paymentId, FAILED, PROCESSING);
+        verifyNoMoreInteractions(paymentRepository, paymentGateway);
+    }
+
+    @Test
+    void executePayment_whenPaymentAlreadyUpdated_throwsException() {
+        long paymentId = 1L;
+        UUID idempotencyKey = UUID.randomUUID();
+        Payment mockedPayment = getMockedPayment(paymentId, idempotencyKey);
+        when(mockedPayment.getStatus()).thenReturn(PaymentStatus.INITIATED).thenReturn(CAPTURED);
+        when(paymentRepository.findById(paymentId)).thenReturn(Optional.of(mockedPayment));
+        when(paymentRepository.setStatusIfCurrentStatusIs(paymentId, PROCESSING, INITIATED)).thenReturn(1);
+        when(paymentRepository.setStatusIfCurrentStatusIs(paymentId, CAPTURED, PROCESSING)).thenReturn(0);
+
+        assertThatThrownBy(() -> paymentService.executePayment(paymentId))
+                .isInstanceOf(ObjectOptimisticLockingFailureException.class)
+                .hasMessage("Object of class [org.learnings.payments.paymentservice.domain.Payment] with identifier " +
+                        "[1]: optimistic locking failed");
+
+        verify(paymentGateway).executePayment(any(PaymentDto.class), eq(idempotencyKey));
         verifyNoMoreInteractions(paymentRepository, paymentGateway);
     }
 

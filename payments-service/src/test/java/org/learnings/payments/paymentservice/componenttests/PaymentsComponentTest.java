@@ -139,6 +139,7 @@ public class PaymentsComponentTest {
                 .andExpect(status().is(errorStatusCode));
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Test
     void executePayment_whenRaceCondition_shouldTriggerLockException() throws ExecutionException, InterruptedException {
         UUID idempotencyId = UUID.randomUUID();
@@ -175,10 +176,9 @@ public class PaymentsComponentTest {
                 }
             }).toList();
 
-            assertThat(resultCodes).containsExactlyInAnyOrder(200, 200);
+            assertThat(resultCodes).containsExactlyInAnyOrder(200, 409);
             assertThat(resultMessages).containsExactlyInAnyOrder(
-                    "{\"paymentId\":" + savedPayment.getPaymentId() + ",\"status\":\"CAPTURED\"}",
-                    "{\"paymentId\":" + savedPayment.getPaymentId() + ",\"status\":\"CAPTURED\"}");
+                    "{\"paymentId\":" + savedPayment.getPaymentId() + ",\"status\":\"CAPTURED\"}", "");
         }
     }
 

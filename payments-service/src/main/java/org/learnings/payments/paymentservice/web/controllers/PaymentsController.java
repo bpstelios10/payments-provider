@@ -8,7 +8,9 @@ import jakarta.validation.constraints.NotNull;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.learnings.payments.paymentservice.services.PaymentService;
 import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -41,6 +43,11 @@ public class PaymentsController {
 
         return ResponseEntity.ok(fromPaymentDto(responseDto));
     }
+
+    @SuppressWarnings({"UnusedDeclaration"})
+    @ResponseStatus(value= HttpStatus.CONFLICT, reason="Race condition error")
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    public void conflict() { }
 
     public record CreatePayment(
             @NotNull

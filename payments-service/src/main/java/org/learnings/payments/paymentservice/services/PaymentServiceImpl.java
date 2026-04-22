@@ -7,6 +7,7 @@ import org.learnings.payments.paymentservice.repositories.PaymentRepository;
 import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -72,7 +73,12 @@ public class PaymentServiceImpl implements PaymentService {
             newStatus = FAILED;
         }
 
-        paymentRepository.setStatusIfCurrentStatusIs(paymentId, newStatus, PROCESSING);
+        int isStatusUpdated = paymentRepository.setStatusIfCurrentStatusIs(paymentId, newStatus, PROCESSING);
+        // i dont need to fail here, but it is a nice tech exercise
+        // for idempotent endpoint, i should just return the latest status from the DB
+        if (isStatusUpdated == 0) {
+            throw new ObjectOptimisticLockingFailureException(Payment.class, paymentId);
+        }
 
         Payment updated = paymentRepository.findById(paymentId).orElseThrow();
 
