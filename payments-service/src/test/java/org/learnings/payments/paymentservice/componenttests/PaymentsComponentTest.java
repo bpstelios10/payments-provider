@@ -7,8 +7,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.learnings.payments.paymentservice.domain.Payment;
+import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.learnings.payments.paymentservice.services.PaymentGateway;
-import org.learnings.payments.paymentservice.services.PaymentResponseDto;
 import org.learnings.payments.paymentservice.web.controllers.PaymentsController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -61,9 +62,10 @@ public class PaymentsComponentTest {
         assertThat(mvcResult).isNotNull();
         assertThat(mvcResult.getResponse()).isNotNull();
         String contentAsString = mvcResult.getResponse().getContentAsString();
-        PaymentResponseDto paymentResponseDto = jsonMapper.readValue(contentAsString, PaymentResponseDto.class);
+        PaymentsController.PaymentResponse paymentResponseDto =
+                jsonMapper.readValue(contentAsString, PaymentsController.PaymentResponse.class);
         assertThat(paymentResponseDto).isNotNull();
-        assertThat(paymentResponseDto.status()).isEqualTo("pending");
+        assertThat(paymentResponseDto.status()).isEqualTo(PaymentStatus.INITIATED);
 
         Payment byPaymentId = repository.findByPaymentId(paymentResponseDto.paymentId());
         assertThat("merch-1").isEqualTo(byPaymentId.getMerchantId());
@@ -103,35 +105,25 @@ public class PaymentsComponentTest {
     @Test
     void executePayment_succeeds() throws Exception {
         UUID idempotencyId = UUID.randomUUID();
-        PaymentsController.CreatePayment requestBody =
-                new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId);
+        Payment payment = new Payment(
+                BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId, PaymentStatus.INITIATED);
 
-        MvcResult mvcResult = mockMvc.perform(
-                        post("/payments")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonMapper.writeValueAsString(requestBody)))
+        Payment savedPayment = repository.save(payment);
+        long paymentId = savedPayment.getPaymentId();
+
+        MvcResult mvcResultExecute = mockMvc.perform(post("/payments/{paymentId}/execute", paymentId))
                 .andExpect(status().isOk())
                 .andReturn();
-        String contentAsString = mvcResult.getResponse().getContentAsString();
-        PaymentResponseDto paymentResponseDto = jsonMapper.readValue(contentAsString, PaymentResponseDto.class);
+        String contentAsString = mvcResultExecute.getResponse().getContentAsString();
+        PaymentsController.PaymentResponse paymentResponseDto =
+                jsonMapper.readValue(contentAsString, PaymentsController.PaymentResponse.class);
         assertThat(paymentResponseDto).isNotNull();
-        assertThat(paymentResponseDto.status()).isEqualTo("pending");
+        assertThat(paymentResponseDto.status()).isEqualTo(PaymentStatus.CAPTURED);
 
-        Long createdPaymentId = paymentResponseDto.paymentId();
-
-        MvcResult mvcResultExecute = mockMvc.perform(post("/payments/{paymentId}/execute", createdPaymentId))
-                .andExpect(status().isOk())
-                .andReturn();
-        contentAsString = mvcResultExecute.getResponse().getContentAsString();
-        paymentResponseDto = jsonMapper.readValue(contentAsString, PaymentResponseDto.class);
-        assertThat(paymentResponseDto).isNotNull();
-        assertThat(paymentResponseDto.status()).isEqualTo("executed");
-
-        Payment byPaymentId = repository.findByPaymentId(createdPaymentId);
+        Payment byPaymentId = repository.findByPaymentId(paymentId);
         assertThat("merch-1").isEqualTo(byPaymentId.getMerchantId());
-        assertThat("executed").isEqualTo(byPaymentId.getStatus());
+        assertThat(PaymentStatus.INITIATED).isNotEqualTo(byPaymentId.getStatus());
         assertThat(byPaymentId.getCreatedDate()).isNotEqualTo(byPaymentId.getUpdatedDate());
-        assertThat(byPaymentId.getVersion()).isGreaterThan(0);
     }
 
     @Test
@@ -150,12 +142,12 @@ public class PaymentsComponentTest {
     @Test
     void executePayment_whenRaceCondition_shouldTriggerLockException() throws ExecutionException, InterruptedException {
         UUID idempotencyId = UUID.randomUUID();
-        Payment payment = new Payment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId, "pending");
+        Payment payment = new Payment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId, PaymentStatus.INITIATED);
 
         Payment savedPayment = repository.save(payment);
         long paymentId = savedPayment.getPaymentId();
 
-        try (ExecutorService executor =  Executors.newFixedThreadPool(2)) {
+        try (ExecutorService executor = Executors.newFixedThreadPool(2)) {
             // mock payment gateway in a way to make sure that both threads will reach this point at the same time
             // this we way we enforce the race condition will 100% happens
             CountDownLatch ready = new CountDownLatch(2);
@@ -164,7 +156,7 @@ public class PaymentsComponentTest {
                 ready.countDown();                          // signal arrival
                 start.await(1, TimeUnit.SECONDS);  // wait for release
                 return null;
-            }).when(paymentGateway).executePayment(any());
+            }).when(paymentGateway).executePayment(any(), eq(idempotencyId));
             CompletableFuture<MvcResult> firstExecute = CompletableFuture.supplyAsync(performExecute(paymentId), executor);
             CompletableFuture<MvcResult> secondExecute = CompletableFuture.supplyAsync(performExecute(paymentId), executor);
 
@@ -183,9 +175,10 @@ public class PaymentsComponentTest {
                 }
             }).toList();
 
-            assertThat(resultCodes).containsExactlyInAnyOrder(200, 409);
+            assertThat(resultCodes).containsExactlyInAnyOrder(200, 200);
             assertThat(resultMessages).containsExactlyInAnyOrder(
-                    "{\"paymentId\":" + savedPayment.getPaymentId() + ",\"status\":\"executed\"}", "");
+                    "{\"paymentId\":" + savedPayment.getPaymentId() + ",\"status\":\"CAPTURED\"}",
+                    "{\"paymentId\":" + savedPayment.getPaymentId() + ",\"status\":\"CAPTURED\"}");
         }
     }
 

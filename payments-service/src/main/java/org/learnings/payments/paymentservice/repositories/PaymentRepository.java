@@ -1,6 +1,7 @@
 package org.learnings.payments.paymentservice.repositories;
 
 import org.learnings.payments.paymentservice.domain.Payment;
+import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -21,11 +22,11 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     Optional<Payment> findByIdempotencyKey(UUID idempotencyKey);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Transactional
     @Query("""
             update Payment p
-            set p.status = :status, p.version = p.version+1
-            where p.paymentId = :paymentId and p.version = :version""")
-    int updateIfVersionMatches(long paymentId, long version, String status);
+            set p.status = :newStatus
+            where p.paymentId = :paymentId and p.status = :currentStatus""")
+    void setStatusIfCurrentStatusIs(long paymentId, PaymentStatus newStatus, PaymentStatus currentStatus);
 }

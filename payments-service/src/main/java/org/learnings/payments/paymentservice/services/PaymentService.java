@@ -2,10 +2,11 @@ package org.learnings.payments.paymentservice.services;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
 
 public interface PaymentService {
 
-    PaymentResponseDto createPayment(@NotNull PaymentDto paymentDto);
+    PaymentDto createPayment(@NotNull PaymentDto paymentDto);
 
-    PaymentResponseDto executePayment(@NotEmpty long paymentId);
+    PaymentDto executePayment(@NotEmpty long paymentId);
 }
