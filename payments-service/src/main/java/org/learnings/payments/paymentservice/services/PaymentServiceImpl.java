@@ -1,6 +1,7 @@
 package org.learnings.payments.paymentservice.services;
 
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.learnings.payments.paymentservice.domain.Payment;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.learnings.payments.paymentservice.repositories.PaymentRepository;
@@ -11,6 +12,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,23 +49,19 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     // This method is not annotated as transactional cause the rest call will keep it open for a long time
-    // so we need to manually check the version for conflicts
+    // so we make it atomic by using Status and no need to rollback in any case of failure.
+    // this is achieved with the PROCESSING status with a timestamp and using idempotency-key on the downstream call.
     @Override
     public PaymentDto executePayment(long paymentId) {
-        Payment payment = paymentRepository
-                .findById(paymentId)
-                .orElseThrow(() ->
-                        new ResponseStatusException(NOT_FOUND, "Payment with id [" + paymentId + "] does not exist"));
-        PaymentDto paymentDto = PaymentDto.fromPayment(payment);
+        PaymentDto paymentDto = getPaymentDtoById(paymentId);
 
         // return fast, if it is already captured or rejected
         if (List.of(CAPTURED, FAILED).contains(paymentDto.getStatus())) {
             return paymentDto;
         }
 
-        // from now on, we want to be thread safe,
-        // but also re-process potential payments that were marked as processed but then server failed
-        paymentRepository.setStatusIfCurrentStatusIs(paymentId, PROCESSING, INITIATED);
+        lockPaymentBySettingStatusProcessing(paymentId);
+
         PaymentStatus newStatus = CAPTURED;
 
         try {
@@ -73,21 +71,20 @@ public class PaymentServiceImpl implements PaymentService {
             newStatus = FAILED;
         }
 
-        int isStatusUpdated = paymentRepository.setStatusIfCurrentStatusIs(paymentId, newStatus, PROCESSING);
-        // i dont need to fail here, but it is a nice tech exercise
-        // for idempotent endpoint, i should just return the latest status from the DB
-        if (isStatusUpdated == 0) {
-            throw new ObjectOptimisticLockingFailureException(Payment.class, paymentId);
-        }
+        // TODO if this update fails, then something weird is happening. might need to throw some error.
+        //  will also need to check this so later only 1 thread is allowed to do things like notifications, etc
+        paymentRepository.setStatusIfCurrentStatusIs(paymentId, newStatus, PROCESSING);
 
         Payment updated = paymentRepository.findById(paymentId).orElseThrow();
 
         return PaymentDto.fromPayment(updated);
     }
 
-//    This is needed because the initial transaction will be marked as dirty. but the previous transaction turns
-//    the whole class as a proxy. so the next lines need to go to some utility class. then this Transactional will work
-//    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    /*
+        This is needed because the initial transaction will be marked as dirty. but the previous transaction turns
+        the whole class as a proxy. so the next lines need to go to some utility class. then this Transactional will work
+        @Transactional(propagation = Propagation.REQUIRES_NEW)
+    */
     private PaymentDto getPaymentIdWhenIsRetry(PaymentDto paymentDto, DataAccessException dae) {
         if (dae instanceof DataIntegrityViolationException && dae.getMessage().contains("UNIQUE_IDEMTOTENCY_KEY")) {
             Optional<Payment> byIdempotencyKey = paymentRepository.findByIdempotencyKey(paymentDto.getIdempotencyKey());
@@ -98,5 +95,23 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         throw dae;
+    }
+
+    private @NonNull PaymentDto getPaymentDtoById(long paymentId) {
+        Payment payment = paymentRepository
+                .findById(paymentId)
+                .orElseThrow(() ->
+                        new ResponseStatusException(NOT_FOUND, "Payment with id [" + paymentId + "] does not exist"));
+        return PaymentDto.fromPayment(payment);
+    }
+
+    private void lockPaymentBySettingStatusProcessing(long paymentId) {
+        Instant now = Instant.now();
+        Instant timeout = now.minusSeconds(10);
+        int isStatusUpdated = paymentRepository.claimProcessingStatus(paymentId, now, timeout);
+        if (isStatusUpdated == 0) {
+            // TODO i have to check again if the status is now CAPTURED or FAILED to be accurate to avoid retries
+            throw new ObjectOptimisticLockingFailureException(Payment.class, paymentId);
+        }
     }
 }

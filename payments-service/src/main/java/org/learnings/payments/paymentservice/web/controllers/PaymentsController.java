@@ -14,6 +14,7 @@ import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.ServiceConfigurationError;
 import java.util.UUID;
 
 import static org.learnings.payments.paymentservice.web.controllers.PaymentsController.PaymentResponse.fromPaymentDto;
@@ -48,6 +49,12 @@ public class PaymentsController {
     @ResponseStatus(value= HttpStatus.CONFLICT, reason="Race condition error")
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
     public void conflict() { }
+
+    // adding this for now for the tests. Exception handling will happen later
+    @SuppressWarnings({"UnusedDeclaration"})
+    @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR, reason="Uncaught Exception")
+    @ExceptionHandler(ServiceConfigurationError.class)
+    public void handleServiceConfigurationError() { }
 
     public record CreatePayment(
             @NotNull
