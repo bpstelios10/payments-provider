@@ -1,5 +1,6 @@
 package org.learnings.payments.paymentservice.repositories;
 
+import jakarta.annotation.Nonnull;
 import org.learnings.payments.paymentservice.domain.Payment;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +18,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Override
     <S extends Payment> S save(S entity);
 
+    @Nonnull
     @Override
     Optional<Payment> findById(Long paymentId);
 
@@ -28,5 +30,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
             update Payment p
             set p.status = :newStatus
             where p.paymentId = :paymentId and p.status = :currentStatus""")
-    void setStatusIfCurrentStatusIs(long paymentId, PaymentStatus newStatus, PaymentStatus currentStatus);
+    int setStatusIfCurrentStatusIs(long paymentId, PaymentStatus newStatus, PaymentStatus currentStatus);
 }
