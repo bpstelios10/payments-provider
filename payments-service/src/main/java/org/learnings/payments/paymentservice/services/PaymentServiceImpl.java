@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import static org.learnings.payments.paymentservice.domain.Payment.UNIQUE_PAYMENT_IDEMPOTENCY_KEY;
 import static org.learnings.payments.paymentservice.domain.PaymentStatus.*;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -43,7 +44,7 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             savedPayment = paymentRepository.save(payment);
             log.debug("payment with id [{}] created at [{}]", savedPayment.getPaymentId(), savedPayment.getCreatedDate());
-        } catch (DataAccessException dae) {
+        } catch (DataIntegrityViolationException dae) {
             log.debug("payment creation failed with error: [{}]", dae.getMessage());
 
             return getPaymentIdWhenIsRetry(paymentDto, dae);
@@ -95,8 +96,8 @@ public class PaymentServiceImpl implements PaymentService {
         the whole class as a proxy. so the next lines need to go to some utility class. then this Transactional will work
         @Transactional(propagation = Propagation.REQUIRES_NEW)
     */
-    private PaymentDto getPaymentIdWhenIsRetry(PaymentDto paymentDto, DataAccessException dae) {
-        if (dae instanceof DataIntegrityViolationException && dae.getMessage().contains("UNIQUE_IDEMTOTENCY_KEY")) {
+    private PaymentDto getPaymentIdWhenIsRetry(PaymentDto paymentDto, DataIntegrityViolationException dae) {
+        if (dae.getMessage().contains(UNIQUE_PAYMENT_IDEMPOTENCY_KEY)) {
             Optional<Payment> byIdempotencyKey = paymentRepository.findByIdempotencyKey(paymentDto.getIdempotencyKey());
 
             if (byIdempotencyKey.isPresent()) {

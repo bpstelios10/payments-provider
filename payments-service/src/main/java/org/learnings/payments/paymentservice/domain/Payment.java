@@ -16,12 +16,14 @@ import java.util.UUID;
 @Table(name = "payments",
         uniqueConstraints = {
                 // for very defensive coding, we need the (id-key, the payment-id) to be unique
-                @UniqueConstraint(name = "UNIQUE_IDEMTOTENCY_KEY", columnNames = {"idempotencyKey"})
+                @UniqueConstraint(name = Payment.UNIQUE_PAYMENT_IDEMPOTENCY_KEY, columnNames = {"idempotencyKey"})
         })
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // for JPA
 @EqualsAndHashCode
 public class Payment {
+
+    public static final String UNIQUE_PAYMENT_IDEMPOTENCY_KEY = "UNIQUE_PAYMENT_IDEMPOTENCY_KEY";
 
     public Payment(BigDecimal amount, String currency, String merchantId, UUID idempotencyKey, PaymentStatus status) {
         this.amount = amount;

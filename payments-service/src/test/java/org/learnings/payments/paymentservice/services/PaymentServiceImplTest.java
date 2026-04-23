@@ -13,7 +13,6 @@ import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
 import org.learnings.payments.paymentservice.services.statustransitions.PaymentActionStrategy;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,6 +25,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.learnings.payments.paymentservice.domain.Payment.UNIQUE_PAYMENT_IDEMPOTENCY_KEY;
 import static org.learnings.payments.paymentservice.domain.PaymentStatus.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -64,19 +64,6 @@ class PaymentServiceImplTest {
     }
 
     @Test
-    void createPayment_whenDataAccessExceptionAndNotDataIntegrityViolationException_throwsTheException() {
-        PaymentDto dto = new PaymentDto(new BigDecimal(100), "EU", "merch-1", UUID.randomUUID(), null);
-        Payment payment = PaymentDto.toPayment(dto, INITIATED);
-        DataAccessException dataAccessException = mock(DataAccessException.class);
-        when(paymentRepository.save(payment)).thenThrow(dataAccessException);
-
-        assertThatThrownBy(() -> paymentService.createPayment(dto))
-                .isInstanceOf(DataAccessException.class);
-
-        verifyNoMoreInteractions(paymentRepository, paymentGateway, paymentActionStrategy);
-    }
-
-    @Test
     void createPayment_whenDataIntegrityViolationExceptionAndNotUniqueConstraintError_throwsTheException() {
         UUID idempotencyKey = UUID.randomUUID();
         PaymentDto dto = new PaymentDto(new BigDecimal(100), "EU", "merch-1", idempotencyKey, null);
@@ -97,13 +84,13 @@ class PaymentServiceImplTest {
         PaymentDto dto = new PaymentDto(new BigDecimal(100), "EU", "merch-1", idempotencyKey, null);
         Payment payment = PaymentDto.toPayment(dto, INITIATED);
         DataIntegrityViolationException dataIntegrityViolationException =
-                new DataIntegrityViolationException("cause: UNIQUE_IDEMTOTENCY_KEY");
+                new DataIntegrityViolationException("cause: " + UNIQUE_PAYMENT_IDEMPOTENCY_KEY);
         when(paymentRepository.save(payment)).thenThrow(dataIntegrityViolationException);
         when(paymentRepository.findByIdempotencyKey(idempotencyKey)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> paymentService.createPayment(dto))
                 .isInstanceOf(DataIntegrityViolationException.class)
-                .hasMessage("cause: UNIQUE_IDEMTOTENCY_KEY");
+                .hasMessage("cause: " + UNIQUE_PAYMENT_IDEMPOTENCY_KEY);
 
         verifyNoMoreInteractions(paymentRepository, paymentGateway, paymentActionStrategy);
     }
@@ -114,7 +101,7 @@ class PaymentServiceImplTest {
         PaymentDto dto = new PaymentDto(new BigDecimal(100), "EU", "merch-1", idempotencyKey, null);
         Payment payment = PaymentDto.toPayment(dto, INITIATED);
         DataIntegrityViolationException dataIntegrityViolationException =
-                new DataIntegrityViolationException("cause: UNIQUE_IDEMTOTENCY_KEY");
+                new DataIntegrityViolationException("cause: " + UNIQUE_PAYMENT_IDEMPOTENCY_KEY);
         when(paymentRepository.save(payment)).thenThrow(dataIntegrityViolationException);
         Payment existingPayment = mock(Payment.class);
         when(existingPayment.getPaymentId()).thenReturn(1L);
