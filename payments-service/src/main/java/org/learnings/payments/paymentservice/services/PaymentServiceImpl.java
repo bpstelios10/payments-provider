@@ -4,8 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.learnings.payments.paymentservice.domain.Payment;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
+import org.learnings.payments.paymentservice.domain.PaymentStatusAction;
 import org.learnings.payments.paymentservice.repositories.PaymentRepository;
 import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
+import org.learnings.payments.paymentservice.services.statustransitions.PaymentActionStrategy;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -25,10 +27,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final PaymentGateway paymentGateway;
+    private final List<PaymentActionStrategy> paymentActionStrategies;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentGateway paymentGateway) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentGateway paymentGateway, List<PaymentActionStrategy> paymentActionStrategies) {
         this.paymentRepository = paymentRepository;
         this.paymentGateway = paymentGateway;
+        this.paymentActionStrategies = paymentActionStrategies;
     }
 
     @Override
@@ -55,25 +59,31 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentDto executePayment(long paymentId) {
         PaymentDto paymentDto = getPaymentDtoById(paymentId);
 
-        // return fast, if it is already captured or rejected
-        if (List.of(CAPTURED, FAILED).contains(paymentDto.getStatus())) {
+        // return fast, if it is not in valid state for processing
+        Optional<PaymentStatus> processingStatus = getNextStatus(paymentDto.getStatus(), PaymentStatusAction.START_PROCESSING);
+        if (processingStatus.isEmpty()) {
             return paymentDto;
         }
 
         lockPaymentBySettingStatusProcessing(paymentId);
 
-        PaymentStatus newStatus = CAPTURED;
+        PaymentStatus currentStatus = PROCESSING;
+        PaymentStatusAction nextAction = PaymentStatusAction.CAPTURE;
 
         try {
             paymentGateway.executePayment(paymentDto, paymentDto.getIdempotencyKey());
         } catch (Exception ex) {
             // TODO not all payment failures should be failed. eg timeouts, etc should remain processing
-            newStatus = FAILED;
+            nextAction = PaymentStatusAction.FAIL;
         }
 
         // TODO if this update fails, then something weird is happening. might need to throw some error.
         //  will also need to check this so later only 1 thread is allowed to do things like notifications, etc
-        paymentRepository.setStatusIfCurrentStatusIs(paymentId, newStatus, PROCESSING);
+        PaymentStatusAction finalNextAction = nextAction;
+        PaymentStatus nextStatus = getNextStatus(currentStatus, nextAction)
+                .orElseThrow(() -> new IllegalStateException("No handler for [" + currentStatus + " + " + finalNextAction + "]"));
+
+        paymentRepository.setStatusIfCurrentStatusIs(paymentId, nextStatus, currentStatus);
 
         Payment updated = paymentRepository.findById(paymentId).orElseThrow();
 
@@ -113,5 +123,13 @@ public class PaymentServiceImpl implements PaymentService {
             // TODO i have to check again if the status is now CAPTURED or FAILED to be accurate to avoid retries
             throw new ObjectOptimisticLockingFailureException(Payment.class, paymentId);
         }
+    }
+
+    private Optional<PaymentStatus> getNextStatus(PaymentStatus currentStatus, PaymentStatusAction nextAction) {
+        Optional<PaymentActionStrategy> paymentActionStrategy = paymentActionStrategies.stream()
+                .filter(s -> s.supports(currentStatus, nextAction))
+                .findFirst();
+
+        return paymentActionStrategy.map(PaymentActionStrategy::getNextState);
     }
 }
