@@ -1,4 +1,30 @@
-# Payments Service Provider
+#  Payments Service Provider
+
+## Overview
+
+`payments-provider` is a learning-focused Payment Service Provider (PSP) style microservices architecture project designed to simulate real-world payment processing workflows.
+
+The goal of the project is to explore:
+
+* payment lifecycle orchestration
+* idempotent API design
+* fault-tolerant service boundaries
+* event-driven microservices communication
+* ledger-based transaction tracking (upcoming)
+* Java concurrency patterns
+* resilience techniques used in production fintech systems
+
+The system currently includes:
+
+* payment-service (implemented)
+* transaction-service (planned)
+* notification-service (planned)
+
+Architecture follows the **database-per-service** microservices pattern.
+
+---
+
+## Targeted Domains
 
 Implementation of a PSP that offers the following functionality:
 
