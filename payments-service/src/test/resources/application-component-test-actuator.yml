@@ -3,3 +3,8 @@ management:
     port: 8080
   prometheus:
     metrics.export.enabled: true
+
+spring:
+  task:
+    scheduling:
+      enabled: false

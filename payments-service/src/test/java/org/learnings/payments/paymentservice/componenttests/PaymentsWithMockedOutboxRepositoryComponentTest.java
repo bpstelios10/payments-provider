@@ -23,13 +23,13 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-public class PaymentsWithMockedOutboxComponentTest {
+public class PaymentsWithMockedOutboxRepositoryComponentTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -44,11 +44,12 @@ public class PaymentsWithMockedOutboxComponentTest {
 
     @BeforeEach
     void setup() {
-        when(outboxRepository.save(any(OutboxEvent.class))).thenThrow(new CannotGetJdbcConnectionException("oops"));
+        doThrow(new CannotGetJdbcConnectionException("oops"))
+                .when(outboxRepository).save(any(OutboxEvent.class));
     }
 
     @Test
-    void createPayment_succeeds() throws Exception {
+    void createPayment_whenFailsToPublishEvent_doesNotCreatePayment() throws Exception {
         UUID idempotencyId = UUID.randomUUID();
         PaymentsController.CreatePayment requestBody =
                 new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId);

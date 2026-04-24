@@ -8,10 +8,10 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.learnings.payments.paymentservice.domain.Payment;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.learnings.payments.paymentservice.domain.PaymentStatusAction;
-import org.learnings.payments.paymentservice.infrastructure.outbox.OutboxEvent;
-import org.learnings.payments.paymentservice.infrastructure.outbox.OutboxRepository;
 import org.learnings.payments.paymentservice.repositories.PaymentRepository;
 import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
+import org.learnings.payments.paymentservice.services.ports.EventMessage;
+import org.learnings.payments.paymentservice.services.ports.EventMessagePublisher;
 import org.learnings.payments.paymentservice.services.statustransitions.PaymentActionStrategy;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,7 +44,7 @@ class PaymentServiceImplTest {
     @Mock
     private PaymentRepository paymentRepository;
     @Mock
-    private OutboxRepository outboxRepository;
+    private EventMessagePublisher eventMessagePublisher;
     @Mock
     private JsonMapper jsonMapper;
     @Mock
@@ -57,8 +57,8 @@ class PaymentServiceImplTest {
 
     @BeforeEach
     void setup() {
-        paymentService = new PaymentServiceImpl(
-                paymentRepository, outboxRepository, jsonMapper, List.of(paymentActionStrategy), paymentGateway, transactionTemplate);
+        paymentService = new PaymentServiceImpl(paymentRepository, eventMessagePublisher, jsonMapper,
+                List.of(paymentActionStrategy), paymentGateway, transactionTemplate);
     }
 
     @Test
@@ -72,8 +72,8 @@ class PaymentServiceImplTest {
         when(jsonMapper.writeValueAsString(savedPayment)).thenReturn(payment.toString());
         mockTransactionTemplateToExecuteCallback();
         when(jsonMapper.writeValueAsString(savedPayment)).thenReturn("saved-payment");
-        OutboxEvent event = new OutboxEvent(1L, "PAYMENT", INITIATED.name(), "saved-payment");
-        when(outboxRepository.save(event)).thenReturn(event);
+        EventMessage event = new EventMessage(1L, "PAYMENT", INITIATED.name(), "saved-payment");
+        doNothing().when(eventMessagePublisher).publish(event);
 
         PaymentDto createdPaymentDto = paymentService.createPayment(dto);
 
@@ -128,8 +128,8 @@ class PaymentServiceImplTest {
         when(jsonMapper.writeValueAsString(savedPayment)).thenReturn(payment.toString());
         mockTransactionTemplateToExecuteCallback();
         when(jsonMapper.writeValueAsString(savedPayment)).thenReturn("saved-payment");
-        OutboxEvent event = new OutboxEvent(1L, "PAYMENT", INITIATED.name(), "saved-payment");
-        when(outboxRepository.save(event)).thenThrow(new CannotGetJdbcConnectionException("oops"));
+        EventMessage event = new EventMessage(1L, "PAYMENT", INITIATED.name(), "saved-payment");
+        doThrow(new CannotGetJdbcConnectionException("oops")).when(eventMessagePublisher).publish(event);
 
         assertThatThrownBy(() -> paymentService.createPayment(dto))
                 .isInstanceOf(DataAccessException.class);
@@ -238,7 +238,7 @@ class PaymentServiceImplTest {
 
     private void verifyNoMoreMockInteractions(Object... extraMocks) {
         Object[] mocks = Stream.concat(
-                Stream.of(paymentRepository, outboxRepository, jsonMapper, paymentGateway, paymentActionStrategy, transactionTemplate),
+                Stream.of(paymentRepository, eventMessagePublisher, jsonMapper, paymentGateway, paymentActionStrategy, transactionTemplate),
                 extraMocks == null ? Stream.empty() : Stream.of(extraMocks)
         ).toArray();
 
