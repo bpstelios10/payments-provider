@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.learnings.payments.paymentservice.services.PaymentService;
 import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -55,6 +56,12 @@ public class PaymentsController {
     @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR, reason="Uncaught Exception")
     @ExceptionHandler(ServiceConfigurationError.class)
     public void handleServiceConfigurationError() { }
+
+    // adding this for now for the tests. Exception handling will happen later
+    @SuppressWarnings({"UnusedDeclaration"})
+    @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR, reason="Uncaught Exception")
+    @ExceptionHandler(DataAccessException.class)
+    public void handleDataAccessException() { }
 
     public record CreatePayment(
             @NotNull

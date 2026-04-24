@@ -61,6 +61,7 @@ public class PaymentsComponentTest {
                         post("/payments")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(jsonMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isOk())
                 .andReturn();
 
         assertThat(mvcResult).isNotNull();

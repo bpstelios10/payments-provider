@@ -5,21 +5,24 @@ import org.jspecify.annotations.NonNull;
 import org.learnings.payments.paymentservice.domain.Payment;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.learnings.payments.paymentservice.domain.PaymentStatusAction;
+import org.learnings.payments.paymentservice.infrastructure.outbox.OutboxEvent;
+import org.learnings.payments.paymentservice.infrastructure.outbox.OutboxRepository;
 import org.learnings.payments.paymentservice.repositories.PaymentRepository;
 import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
 import org.learnings.payments.paymentservice.services.statustransitions.PaymentActionStrategy;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import static org.learnings.payments.paymentservice.domain.Payment.UNIQUE_PAYMENT_IDEMPOTENCY_KEY;
-import static org.learnings.payments.paymentservice.domain.PaymentStatus.*;
+import static org.learnings.payments.paymentservice.domain.PaymentStatus.INITIATED;
+import static org.learnings.payments.paymentservice.domain.PaymentStatus.PROCESSING;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j
@@ -27,27 +30,42 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final PaymentGateway paymentGateway;
+    private final OutboxRepository outboxRepository;
+    private final JsonMapper jsonMapper;
     private final List<PaymentActionStrategy> paymentActionStrategies;
+    private final PaymentGateway paymentGateway;
+    private final TransactionTemplate transactionTemplate;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, PaymentGateway paymentGateway, List<PaymentActionStrategy> paymentActionStrategies) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, OutboxRepository outboxRepository, JsonMapper jsonMapper,
+                              List<PaymentActionStrategy> paymentActionStrategies, PaymentGateway paymentGateway, TransactionTemplate transactionTemplate) {
         this.paymentRepository = paymentRepository;
-        this.paymentGateway = paymentGateway;
+        this.outboxRepository = outboxRepository;
+        this.jsonMapper = jsonMapper;
         this.paymentActionStrategies = paymentActionStrategies;
+        this.paymentGateway = paymentGateway;
+        this.transactionTemplate = transactionTemplate;
     }
 
+    /*
+     * we cant mark this method as Transactional cause in case of failure, the transaction is marked for rollback. but
+     * then in the catch block, we need to do another payment request, but the transaction is now dirty. issues!
+     * we resolve by using saveAndAudit for atomicity. we use TransactionTemplate in there, to keep the transaction
+     * scope narrower, inside the saveAndAudit method only. (cant mark saveAndAudit as Transactional cause it is private
+     * and internal method). Now, the catch block is safe. We use the repo, so another independent transaction, in there
+     */
     @Override
     public PaymentDto createPayment(PaymentDto paymentDto) {
         Payment payment = PaymentDto.toPayment(paymentDto, INITIATED);
         Payment savedPayment;
 
         try {
-            savedPayment = paymentRepository.save(payment);
+            savedPayment = saveAndAudit(payment, INITIATED);
             log.debug("payment with id [{}] created at [{}]", savedPayment.getPaymentId(), savedPayment.getCreatedDate());
         } catch (DataIntegrityViolationException dae) {
             log.debug("payment creation failed with error: [{}]", dae.getMessage());
+            Optional<Payment> byIdempotencyKey = paymentRepository.findByIdempotencyKey(paymentDto.getIdempotencyKey());
 
-            return getPaymentIdWhenIsRetry(paymentDto, dae);
+            return PaymentDto.fromPayment(byIdempotencyKey.orElseThrow(() -> dae));
         }
 
         return PaymentDto.fromPayment(savedPayment);
@@ -91,21 +109,17 @@ public class PaymentServiceImpl implements PaymentService {
         return PaymentDto.fromPayment(updated);
     }
 
-    /*
-        This is needed because the initial transaction will be marked as dirty. but the previous transaction turns
-        the whole class as a proxy. so the next lines need to go to some utility class. then this Transactional will work
-        @Transactional(propagation = Propagation.REQUIRES_NEW)
-    */
-    private PaymentDto getPaymentIdWhenIsRetry(PaymentDto paymentDto, DataIntegrityViolationException dae) {
-        if (dae.getMessage().contains(UNIQUE_PAYMENT_IDEMPOTENCY_KEY)) {
-            Optional<Payment> byIdempotencyKey = paymentRepository.findByIdempotencyKey(paymentDto.getIdempotencyKey());
+    @SuppressWarnings("SameParameterValue")
+    private Payment saveAndAudit(Payment payment, PaymentStatus paymentStatus) {
+        return transactionTemplate.execute(_ -> {
+            Payment saved = paymentRepository.save(payment);
 
-            if (byIdempotencyKey.isPresent()) {
-                return PaymentDto.fromPayment(byIdempotencyKey.get());
-            }
-        }
+            OutboxEvent event = new OutboxEvent(saved.getPaymentId(), "PAYMENT",
+                    paymentStatus.name(), jsonMapper.writeValueAsString(saved));
+            outboxRepository.save(event);
 
-        throw dae;
+            return saved;
+        });
     }
 
     private @NonNull PaymentDto getPaymentDtoById(long paymentId) {
