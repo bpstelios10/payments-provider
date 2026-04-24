@@ -8,20 +8,28 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.learnings.payments.paymentservice.domain.Payment;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.learnings.payments.paymentservice.domain.PaymentStatusAction;
+import org.learnings.payments.paymentservice.infrastructure.outbox.OutboxEvent;
+import org.learnings.payments.paymentservice.infrastructure.outbox.OutboxRepository;
 import org.learnings.payments.paymentservice.repositories.PaymentRepository;
 import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
 import org.learnings.payments.paymentservice.services.statustransitions.PaymentActionStrategy;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -36,46 +44,42 @@ class PaymentServiceImplTest {
     @Mock
     private PaymentRepository paymentRepository;
     @Mock
+    private OutboxRepository outboxRepository;
+    @Mock
+    private JsonMapper jsonMapper;
+    @Mock
     private PaymentGateway paymentGateway;
     @Mock
     private PaymentActionStrategy paymentActionStrategy;
+    @Mock
+    private TransactionTemplate transactionTemplate;
     private PaymentServiceImpl paymentService;
 
     @BeforeEach
     void setup() {
-        paymentService = new PaymentServiceImpl(paymentRepository, paymentGateway, List.of(paymentActionStrategy));
+        paymentService = new PaymentServiceImpl(
+                paymentRepository, outboxRepository, jsonMapper, List.of(paymentActionStrategy), paymentGateway, transactionTemplate);
     }
 
     @Test
     void createPayment_succeeds() {
-        PaymentDto dto = new PaymentDto(new BigDecimal(100), "EU", "merch-1", UUID.randomUUID(), null);
+        UUID idempotencyKey = UUID.randomUUID();
+        PaymentDto dto = new PaymentDto(new BigDecimal(100), "EU", "merch-1", idempotencyKey, null);
         Payment payment = PaymentDto.toPayment(dto, INITIATED);
-        Payment savedPayment = mock(Payment.class);
-        when(paymentRepository.save(payment)).thenReturn(savedPayment);
-        when(savedPayment.getPaymentId()).thenReturn(1L);
-        when(savedPayment.getStatus()).thenReturn(INITIATED);
+        Payment savedPayment = getMockedPayment(1L, idempotencyKey, INITIATED);
         when(savedPayment.getCreatedDate()).thenReturn(Instant.now());
+        when(paymentRepository.save(payment)).thenReturn(savedPayment);
+        when(jsonMapper.writeValueAsString(savedPayment)).thenReturn(payment.toString());
+        mockTransactionTemplateToExecuteCallback();
+        when(jsonMapper.writeValueAsString(savedPayment)).thenReturn("saved-payment");
+        OutboxEvent event = new OutboxEvent(1L, "PAYMENT", INITIATED.name(), "saved-payment");
+        when(outboxRepository.save(event)).thenReturn(event);
 
         PaymentDto createdPaymentDto = paymentService.createPayment(dto);
 
         assertThat(1L).isEqualTo(createdPaymentDto.getPaymentId());
         assertThat(INITIATED).isEqualTo(createdPaymentDto.getStatus());
-        verifyNoMoreInteractions(paymentRepository, paymentGateway, paymentActionStrategy);
-    }
-
-    @Test
-    void createPayment_whenDataIntegrityViolationExceptionAndNotUniqueConstraintError_throwsTheException() {
-        UUID idempotencyKey = UUID.randomUUID();
-        PaymentDto dto = new PaymentDto(new BigDecimal(100), "EU", "merch-1", idempotencyKey, null);
-        Payment payment = PaymentDto.toPayment(dto, INITIATED);
-        DataIntegrityViolationException dataIntegrityViolationException = new DataIntegrityViolationException("some cause");
-        when(paymentRepository.save(payment)).thenThrow(dataIntegrityViolationException);
-
-        assertThatThrownBy(() -> paymentService.createPayment(dto))
-                .isInstanceOf(DataIntegrityViolationException.class)
-                .hasMessage("some cause");
-
-        verifyNoMoreInteractions(paymentRepository, paymentGateway, paymentActionStrategy);
+        verifyNoMoreMockInteractions();
     }
 
     @Test
@@ -86,13 +90,14 @@ class PaymentServiceImplTest {
         DataIntegrityViolationException dataIntegrityViolationException =
                 new DataIntegrityViolationException("cause: " + UNIQUE_PAYMENT_IDEMPOTENCY_KEY);
         when(paymentRepository.save(payment)).thenThrow(dataIntegrityViolationException);
+        mockTransactionTemplateToExecuteCallback();
         when(paymentRepository.findByIdempotencyKey(idempotencyKey)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> paymentService.createPayment(dto))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessage("cause: " + UNIQUE_PAYMENT_IDEMPOTENCY_KEY);
 
-        verifyNoMoreInteractions(paymentRepository, paymentGateway, paymentActionStrategy);
+        verifyNoMoreMockInteractions();
     }
 
     @Test
@@ -103,16 +108,33 @@ class PaymentServiceImplTest {
         DataIntegrityViolationException dataIntegrityViolationException =
                 new DataIntegrityViolationException("cause: " + UNIQUE_PAYMENT_IDEMPOTENCY_KEY);
         when(paymentRepository.save(payment)).thenThrow(dataIntegrityViolationException);
-        Payment existingPayment = mock(Payment.class);
-        when(existingPayment.getPaymentId()).thenReturn(1L);
-        when(existingPayment.getStatus()).thenReturn(INITIATED);
+        Payment existingPayment = getMockedPayment(1L, idempotencyKey, INITIATED);
+        mockTransactionTemplateToExecuteCallback();
         when(paymentRepository.findByIdempotencyKey(idempotencyKey)).thenReturn(Optional.of(existingPayment));
 
         PaymentDto createdPaymentDto = paymentService.createPayment(dto);
 
         assertThat(1L).isEqualTo(createdPaymentDto.getPaymentId());
         assertThat(INITIATED).isEqualTo(createdPaymentDto.getStatus());
-        verifyNoMoreInteractions(paymentRepository, paymentGateway, paymentActionStrategy);
+        verifyNoMoreMockInteractions();
+    }
+
+    @Test
+    void createPayment_whenOutboxSaveFails_throws() {
+        PaymentDto dto = new PaymentDto(new BigDecimal(100), "EU", "merch-1", UUID.randomUUID(), null);
+        Payment payment = PaymentDto.toPayment(dto, INITIATED);
+        Payment savedPayment = getMockedPayment(1L);
+        when(paymentRepository.save(payment)).thenReturn(savedPayment);
+        when(jsonMapper.writeValueAsString(savedPayment)).thenReturn(payment.toString());
+        mockTransactionTemplateToExecuteCallback();
+        when(jsonMapper.writeValueAsString(savedPayment)).thenReturn("saved-payment");
+        OutboxEvent event = new OutboxEvent(1L, "PAYMENT", INITIATED.name(), "saved-payment");
+        when(outboxRepository.save(event)).thenThrow(new CannotGetJdbcConnectionException("oops"));
+
+        assertThatThrownBy(() -> paymentService.createPayment(dto))
+                .isInstanceOf(DataAccessException.class);
+
+        verifyNoMoreMockInteractions(savedPayment);
     }
 
     @Test
@@ -120,8 +142,7 @@ class PaymentServiceImplTest {
         // mock payment entity
         long paymentId = 1L;
         UUID idempotencyKey = UUID.randomUUID();
-        Payment mockedPayment = getMockedPayment(paymentId, idempotencyKey);
-        when(mockedPayment.getStatus()).thenReturn(INITIATED).thenReturn(CAPTURED);
+        Payment mockedPayment = getMockedPayment(1L, idempotencyKey, INITIATED, CAPTURED);
         // mock the payment strategies
         when(paymentActionStrategy.supports(INITIATED, PaymentStatusAction.START_PROCESSING)).thenReturn(true);
         when(paymentActionStrategy.supports(PROCESSING, PaymentStatusAction.CAPTURE)).thenReturn(true);
@@ -137,7 +158,7 @@ class PaymentServiceImplTest {
         assertThat(1L).isEqualTo(responsePaymentDto.getPaymentId());
         assertThat(PaymentStatus.CAPTURED).isEqualTo(responsePaymentDto.getStatus());
         verify(paymentGateway).executePayment(any(PaymentDto.class), eq(idempotencyKey));
-        verifyNoMoreInteractions(paymentRepository, paymentGateway, paymentActionStrategy);
+        verifyNoMoreMockInteractions();
     }
 
     @Test
@@ -149,15 +170,14 @@ class PaymentServiceImplTest {
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessage("404 NOT_FOUND \"Payment with id [" + paymentId + "] does not exist\"");
 
-        verifyNoMoreInteractions(paymentRepository, paymentGateway, paymentActionStrategy);
+        verifyNoMoreMockInteractions();
     }
 
     @ParameterizedTest
     @EnumSource(value = PaymentStatus.class, names = {"CAPTURED", "FAILED"})
     void executePayment_whenPaymentAlreadyProcessed_returnsState(PaymentStatus paymentStatus) {
         long paymentId = 1L;
-        Payment mockedPayment = mock(Payment.class);
-        when(mockedPayment.getPaymentId()).thenReturn(paymentId);
+        Payment mockedPayment = getMockedPayment(paymentId);
         when(mockedPayment.getStatus()).thenReturn(paymentStatus);
         when(paymentRepository.findById(paymentId)).thenReturn(Optional.of(mockedPayment));
         when(paymentActionStrategy.supports(paymentStatus, PaymentStatusAction.START_PROCESSING)).thenReturn(false);
@@ -167,7 +187,7 @@ class PaymentServiceImplTest {
         assertThat(responsePaymentDto).isNotNull();
         assertThat(1L).isEqualTo(responsePaymentDto.getPaymentId());
         assertThat(paymentStatus).isEqualTo(responsePaymentDto.getStatus());
-        verifyNoMoreInteractions(paymentRepository, paymentGateway, paymentActionStrategy);
+        verifyNoMoreMockInteractions();
     }
 
     @Test
@@ -175,8 +195,7 @@ class PaymentServiceImplTest {
         // mock the payment entity
         long paymentId = 1L;
         UUID idempotencyKey = UUID.randomUUID();
-        Payment mockedPayment = getMockedPayment(paymentId, idempotencyKey);
-        when(mockedPayment.getStatus()).thenReturn(INITIATED).thenReturn(CAPTURED);
+        Payment mockedPayment = getMockedPayment(paymentId, idempotencyKey, INITIATED, CAPTURED);
         // mock the payment strategies
         when(paymentActionStrategy.supports(INITIATED, PaymentStatusAction.START_PROCESSING)).thenReturn(true);
         when(paymentActionStrategy.getNextState()).thenReturn(PROCESSING);
@@ -189,7 +208,7 @@ class PaymentServiceImplTest {
                 .hasMessage("Object of class [org.learnings.payments.paymentservice.domain.Payment] with identifier " +
                         "[1]: optimistic locking failed");
 
-        verifyNoMoreInteractions(paymentRepository, paymentGateway, paymentActionStrategy);
+        verifyNoMoreMockInteractions();
     }
 
     @Test
@@ -197,8 +216,7 @@ class PaymentServiceImplTest {
         // mock the payment entity
         long paymentId = 1L;
         UUID idempotencyKey = UUID.randomUUID();
-        Payment mockedPayment = getMockedPayment(paymentId, idempotencyKey);
-        when(mockedPayment.getStatus()).thenReturn(INITIATED).thenReturn(FAILED);
+        Payment mockedPayment = getMockedPayment(paymentId, idempotencyKey, INITIATED, FAILED);
         // mock the payment strategies
         when(paymentActionStrategy.supports(INITIATED, PaymentStatusAction.START_PROCESSING)).thenReturn(true);
         when(paymentActionStrategy.supports(PROCESSING, PaymentStatusAction.FAIL)).thenReturn(true);
@@ -215,14 +233,54 @@ class PaymentServiceImplTest {
         assertThat(responsePaymentDto).isNotNull();
         assertThat(1L).isEqualTo(responsePaymentDto.getPaymentId());
         assertThat(PaymentStatus.FAILED).isEqualTo(responsePaymentDto.getStatus());
-        verifyNoMoreInteractions(paymentRepository, paymentGateway, paymentActionStrategy);
+        verifyNoMoreMockInteractions();
+    }
+
+    private void verifyNoMoreMockInteractions(Object... extraMocks) {
+        Object[] mocks = Stream.concat(
+                Stream.of(paymentRepository, outboxRepository, jsonMapper, paymentGateway, paymentActionStrategy, transactionTemplate),
+                extraMocks == null ? Stream.empty() : Stream.of(extraMocks)
+        ).toArray();
+
+        verifyNoMoreInteractions(mocks);
+    }
+
+    private Payment getMockedPayment(long paymentId) {
+        Payment mockedPayment = mock(Payment.class);
+        when(mockedPayment.getPaymentId()).thenReturn(paymentId);
+
+        return mockedPayment;
     }
 
     private Payment getMockedPayment(long paymentId, UUID idempotencyKey) {
-        Payment mockedPayment = mock(Payment.class);
-        when(mockedPayment.getPaymentId()).thenReturn(paymentId);
+        Payment mockedPayment = getMockedPayment(paymentId);
         when(mockedPayment.getIdempotencyKey()).thenReturn(idempotencyKey);
 
         return mockedPayment;
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private Payment getMockedPayment(long paymentId, UUID idempotencyKey, PaymentStatus paymentStatus) {
+        Payment mockedPayment = getMockedPayment(paymentId, idempotencyKey);
+        when(mockedPayment.getStatus()).thenReturn(paymentStatus);
+
+        return mockedPayment;
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private Payment getMockedPayment(long paymentId, UUID idempotencyKey, PaymentStatus paymentStatus, PaymentStatus paymentStatus2) {
+        Payment mockedPayment = getMockedPayment(paymentId, idempotencyKey);
+        when(mockedPayment.getStatus()).thenReturn(paymentStatus).thenReturn(paymentStatus2);
+
+        return mockedPayment;
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    private void mockTransactionTemplateToExecuteCallback() {
+        doAnswer(invocation -> {
+            TransactionCallback<?> callback = invocation.getArgument(0);
+
+            return callback.doInTransaction(null); // simulate  behavior
+        }).when(transactionTemplate).execute(any());
     }
 }
