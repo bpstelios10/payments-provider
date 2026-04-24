@@ -1,11 +1,9 @@
 package org.learnings.payments.paymentservice.infrastructure.outbox;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.learnings.payments.paymentservice.services.ports.EventMessage;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -17,7 +15,7 @@ import java.util.UUID;
 @EqualsAndHashCode
 public class OutboxEvent {
 
-    public OutboxEvent(Long aggregateId, String aggregateType, String eventType, String payload) {
+    OutboxEvent(Long aggregateId, String aggregateType, String eventType, String payload) {
         this.aggregateId = aggregateId;
         this.aggregateType = aggregateType;
         this.eventType = eventType;
@@ -35,5 +33,18 @@ public class OutboxEvent {
     @SuppressWarnings({"UnusedDeclaration"})
     @CreationTimestamp
     private Instant createdAt;
-    private final boolean published = false;
+    @Setter
+    private boolean published = false;
+    @Setter
+    private int retryCount = 0;
+    @Setter
+    private Instant nextRetryAt = Instant.now();
+    @Setter
+    private boolean failed = false;
+    @Setter
+    private String lastError;
+
+    static OutboxEvent fromEventMessage(EventMessage event) {
+        return new OutboxEvent(event.aggregateId(), event.aggregateType(), event.eventType(), event.payload());
+    }
 }

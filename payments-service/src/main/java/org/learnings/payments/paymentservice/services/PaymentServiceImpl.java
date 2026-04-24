@@ -5,10 +5,10 @@ import org.jspecify.annotations.NonNull;
 import org.learnings.payments.paymentservice.domain.Payment;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.learnings.payments.paymentservice.domain.PaymentStatusAction;
-import org.learnings.payments.paymentservice.infrastructure.outbox.OutboxEvent;
-import org.learnings.payments.paymentservice.infrastructure.outbox.OutboxRepository;
 import org.learnings.payments.paymentservice.repositories.PaymentRepository;
 import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
+import org.learnings.payments.paymentservice.services.ports.EventMessage;
+import org.learnings.payments.paymentservice.services.ports.EventMessagePublisher;
 import org.learnings.payments.paymentservice.services.statustransitions.PaymentActionStrategy;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -30,16 +30,17 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final OutboxRepository outboxRepository;
+    private final EventMessagePublisher eventMessagePublisher;
     private final JsonMapper jsonMapper;
     private final List<PaymentActionStrategy> paymentActionStrategies;
     private final PaymentGateway paymentGateway;
     private final TransactionTemplate transactionTemplate;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, OutboxRepository outboxRepository, JsonMapper jsonMapper,
-                              List<PaymentActionStrategy> paymentActionStrategies, PaymentGateway paymentGateway, TransactionTemplate transactionTemplate) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, EventMessagePublisher eventMessagePublisher,
+                              JsonMapper jsonMapper, List<PaymentActionStrategy> paymentActionStrategies,
+                              PaymentGateway paymentGateway, TransactionTemplate transactionTemplate) {
         this.paymentRepository = paymentRepository;
-        this.outboxRepository = outboxRepository;
+        this.eventMessagePublisher = eventMessagePublisher;
         this.jsonMapper = jsonMapper;
         this.paymentActionStrategies = paymentActionStrategies;
         this.paymentGateway = paymentGateway;
@@ -114,9 +115,9 @@ public class PaymentServiceImpl implements PaymentService {
         return transactionTemplate.execute(_ -> {
             Payment saved = paymentRepository.save(payment);
 
-            OutboxEvent event = new OutboxEvent(saved.getPaymentId(), "PAYMENT",
-                    paymentStatus.name(), jsonMapper.writeValueAsString(saved));
-            outboxRepository.save(event);
+            EventMessage event = new EventMessage(saved.getPaymentId(), "PAYMENT", paymentStatus.name(),
+                    jsonMapper.writeValueAsString(saved));
+            eventMessagePublisher.publish(event);
 
             return saved;
         });
