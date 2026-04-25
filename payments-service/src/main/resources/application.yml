@@ -42,3 +42,14 @@ spring:
       path: '/h2-console'
       settings:
         web-allow-others: true
+
+service:
+  processing-status-timeout-seconds: 10
+
+outbox:
+  schedule:
+    delay: 5000
+    initialDelay: 5000
+  spring:
+    scheduling:
+      enabled: true

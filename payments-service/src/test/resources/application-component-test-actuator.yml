@@ -4,7 +4,7 @@ management:
   prometheus:
     metrics.export.enabled: true
 
-spring:
-  task:
+outbox:
+  spring:
     scheduling:
       enabled: false

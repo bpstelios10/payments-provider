@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,9 +20,9 @@ public interface OutboxRepository extends JpaRepository<OutboxEvent, UUID> {
             SELECT * FROM outbox_event
             WHERE published = false
               AND failed = false
-              AND next_retry_at <= now()
+              AND next_retry_at <= :now
             ORDER BY created_at
             LIMIT 100
             FOR UPDATE SKIP LOCKED""", nativeQuery = true)
-    List<OutboxEvent> findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc();
+    List<OutboxEvent> findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc(Instant now);
 }

@@ -26,7 +26,8 @@ class OutboxEventProcessorTest {
     void processPendingEvents_succeeds() {
         OutboxEvent event1 = new OutboxEvent(1L, "PAYMENT", "PAYMENT_STATUS", "{}");
         OutboxEvent event2 = new OutboxEvent(2L, "PAYMENT", "PAYMENT_STATUS", "{}");
-        when(outboxRepository.findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc())
+        when(outboxRepository.
+                findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc(any(Instant.class)))
                 .thenReturn(List.of(event1, event2));
 
         outboxEventProcessor.processPendingEvents();
@@ -44,7 +45,8 @@ class OutboxEventProcessorTest {
 
     @Test
     void publishEvents_whenNoEvents_noProcessing() {
-        when(outboxRepository.findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc())
+        when(outboxRepository.
+                findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc(any(Instant.class)))
                 .thenReturn(List.of());
 
         outboxEventProcessor.processPendingEvents();
@@ -56,7 +58,8 @@ class OutboxEventProcessorTest {
     void publishEvents_whenEventSenderFails_setRetries() {
         OutboxEvent event1 = new OutboxEvent(1L, "PAYMENT", "PAYMENT_STATUS", "{}");
         OutboxEvent event2 = new OutboxEvent(2L, "PAYMENT", "PAYMENT_STATUS", "{}");
-        when(outboxRepository.findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc())
+        when(outboxRepository.
+                findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc(any(Instant.class)))
                 .thenReturn(List.of(event1, event2));
         doNothing().when(outboxEventSender).send(event1);
         doThrow(new RuntimeException("Failed to send event2")).when(outboxEventSender).send(event2);
@@ -75,7 +78,8 @@ class OutboxEventProcessorTest {
     @Test
     void publishEvents_whenEventSenderFailsMultipleTimes_setRetriesSucceeds() {
         OutboxEvent event1 = new OutboxEvent(1L, "PAYMENT", "PAYMENT_STATUS", "{}");
-        when(outboxRepository.findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc())
+        when(outboxRepository.
+                findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc(any(Instant.class)))
                 .thenReturn(List.of(event1));
         doThrow(new RuntimeException("Failed to send event1")).when(outboxEventSender).send(event1);
         int retryCount = 0;

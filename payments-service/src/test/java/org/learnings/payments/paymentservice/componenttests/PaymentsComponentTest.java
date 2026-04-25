@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -39,6 +40,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ActiveProfiles("component-test")
 @AutoConfigureMockMvc
 public class PaymentsComponentTest {
 
@@ -256,7 +258,7 @@ public class PaymentsComponentTest {
         assertThat(capturedPayment.getCreatedDate()).isBefore(capturedPayment.getProcessingStartedAt());
 
         // wait for processing timeout to pass
-        sleep(Duration.ofSeconds(11)); // TODO make this configurable for tests
+        sleep(Duration.ofSeconds(3)); // TODO make this configurable for tests
 
         // SECOND ATTEMPT
         MvcResult mvcResultExecute = mockMvc.perform(post("/payments/{paymentId}/execute", paymentId))
