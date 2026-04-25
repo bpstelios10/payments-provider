@@ -9,5 +9,6 @@ public class KafkaOutboxEventSender implements OutboxEventSender {
 
     @Override
     public void send(OutboxEvent event) {
+        System.out.println("Inside Kafka for event: " + event.getEventType());
     }
 }

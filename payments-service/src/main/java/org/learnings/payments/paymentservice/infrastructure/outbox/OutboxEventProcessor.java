@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -22,7 +23,8 @@ public class OutboxEventProcessor {
     @Transactional
     public void processPendingEvents() {
         List<OutboxEvent> events = outboxRepository.
-                findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc();
+                findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc(
+                        Instant.now().truncatedTo(ChronoUnit.MILLIS));
 
         for (OutboxEvent event : events) {
             try {
@@ -47,7 +49,8 @@ public class OutboxEventProcessor {
             return;
         }
 
-        event.setNextRetryAt(Instant.now().plusSeconds(backoff(retry)));
+        Instant nextRetryAt = Instant.now().plusSeconds(backoff(retry)).truncatedTo(ChronoUnit.MILLIS);
+        event.setNextRetryAt(nextRetryAt);
     }
 
     private long backoff(int retry) {

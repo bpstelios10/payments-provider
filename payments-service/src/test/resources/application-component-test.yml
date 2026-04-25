@@ -1,0 +1,7 @@
+service:
+  processing-status-timeout-seconds: 2
+
+outbox:
+  spring:
+    scheduling:
+      enabled: false

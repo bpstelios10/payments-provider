@@ -1,6 +1,7 @@
 package org.learnings.payments.paymentservice.infrastructure.schedulers;
 
 import org.learnings.payments.paymentservice.infrastructure.outbox.OutboxEventProcessor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
  * It is a separate class to separate the scheduling/timing part from the outbox logic
  */
 @Component
+@ConditionalOnProperty(name = "outbox.spring.scheduling.enabled", havingValue = "true")
 public class OutboxScheduler {
 
     private final OutboxEventProcessor processor;
@@ -17,7 +19,7 @@ public class OutboxScheduler {
         this.processor = processor;
     }
 
-    @Scheduled(fixedDelay = 5000)
+    @Scheduled(fixedDelayString = "${outbox.schedule.delay}", initialDelayString = "${outbox.schedule.initialDelay}")
     public void process() {
         processor.processPendingEvents();
     }

@@ -10,6 +10,7 @@ import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
 import org.learnings.payments.paymentservice.services.ports.EventMessage;
 import org.learnings.payments.paymentservice.services.ports.EventMessagePublisher;
 import org.learnings.payments.paymentservice.services.statustransitions.PaymentActionStrategy;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,6 +31,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
+    @Value("${service.processing-status-timeout-seconds:10}") private int PROCESSING_STATUS_TIMEOUT_DURATION_SECS;
     private final PaymentRepository paymentRepository;
     private final EventMessagePublisher eventMessagePublisher;
     private final JsonMapper jsonMapper;
@@ -132,8 +135,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void lockPaymentBySettingStatusProcessing(long paymentId) {
-        Instant now = Instant.now();
-        Instant timeout = now.minusSeconds(10);
+        Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
+        Instant timeout = now.minusSeconds(PROCESSING_STATUS_TIMEOUT_DURATION_SECS);
         int isStatusUpdated = paymentRepository.claimProcessingStatus(paymentId, now, timeout);
         if (isStatusUpdated == 0) {
             // TODO i have to check again if the status is now CAPTURED or FAILED to be accurate to avoid retries
