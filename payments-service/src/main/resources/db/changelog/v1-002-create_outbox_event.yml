@@ -1,0 +1,115 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: v1-002-create_outbox_event
+      author: stelios
+      context: test,dev,prod
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        not:
+          tableExists:
+            tableName: outbox_eventauthor
+      changes:
+        - createTable:
+            tableName: outbox_event
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_outbox_event
+              - column:
+                  name: aggregate_id
+                  type: BIGINT
+              - column:
+                  name: aggregate_type
+                  type: VARCHAR(100)
+              - column:
+                  name: event_type
+                  type: VARCHAR(100)
+              - column:
+                  name: payload
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: published
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: retry_count
+                  type: INT
+                  defaultValueNumeric: 0
+              - column:
+                  name: next_retry_at
+                  type: TIMESTAMP
+              - column:
+                  name: failed
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: last_error
+                  type: VARCHAR(1000)
+
+      rollback:
+        - dropTable:
+            tableName: outbox_event
+
+# indexes (works on both H2 + Postgres)
+  - changeSet:
+      id: v1-002-create_outbox_event-indexes
+      author: stelios
+      context: test,dev,prod
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            tableName: outbox_event
+            indexName: idx_outbox_polling
+      changes:
+        - createIndex:
+            tableName: outbox_event
+            indexName: idx_outbox_polling
+            columns:
+              - column:
+                  name: published
+              - column:
+                  name: failed
+              - column:
+                  name: next_retry_at
+              - column:
+                  name: created_at
+      rollback:
+        - dropIndex:
+            indexName: idx_outbox_polling
+            tableName: outbox_event
+
+# Postgres-optimized partial index
+  - changeSet:
+      id: v1-002-create_outbox_event-postgresql-indexes
+      author: stelios
+      context: prod,dev
+      dbms: postgresql
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          indexExists:
+            tableName: outbox_event
+            indexName: idx_outbox_polling_partial
+      changes:
+        - createIndex:
+            tableName: outbox_event
+            indexName: idx_outbox_polling_partial
+            columns:
+              - column:
+                  name: next_retry_at
+              - column:
+                  name: created_at
+            where: "published = false AND failed = false"
+      rollback:
+        - dropIndex:
+            indexName: idx_outbox_polling_partial
+            tableName: outbox_event

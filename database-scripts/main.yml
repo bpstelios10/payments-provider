@@ -1,7 +1,0 @@
-databaseChangeLog:
-
-  - include:
-      file: changelog/001-payments.yml
-
-  - include:
-      file: changelog/002-outbox-event.yml
