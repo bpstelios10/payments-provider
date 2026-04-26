@@ -1,0 +1,68 @@
+databaseChangeLog:
+  - changeSet:
+      id: v1-001-create-ledger-entries
+      author: stelios
+      context: test,dev,prod
+
+      preConditions:
+        onFail: MARK_RAN
+        onError: HALT
+        not:
+          tableExists:
+            tableName: ledger_entries
+
+      changes:
+        - createTable:
+            tableName: ledger_entries
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: event_id
+                  type: UUID
+              - column:
+                  name: payment_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: amount
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reference_id
+                  type: UUID
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: ledger_entries
+            columnNames: event_id
+            constraintName: UNIQUE_LEDGER_ENTRY_IDEMPOTENCY_KEY
+
+        - createIndex:
+            indexName: idx_ledger_payment_id
+            tableName: ledger_entries
+            columns:
+              - column:
+                  name: payment_id
+
+      rollback:
+        - dropTable:
+            tableName: ledger_entries
