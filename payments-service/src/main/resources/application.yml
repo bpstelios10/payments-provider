@@ -42,6 +42,10 @@ spring:
       path: '/h2-console'
       settings:
         web-allow-others: true
+  liquibase:
+    change-log: classpath:/db/changelog/changelog-master.yml
+    enabled: true
+    contexts: dev
 
 service:
   processing-status-timeout-seconds: 10

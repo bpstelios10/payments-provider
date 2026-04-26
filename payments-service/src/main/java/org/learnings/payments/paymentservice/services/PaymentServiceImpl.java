@@ -136,7 +136,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     private void lockPaymentBySettingStatusProcessing(long paymentId) {
         Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);
-        Instant timeout = now.minusSeconds(PROCESSING_STATUS_TIMEOUT_DURATION_SECS);
+        Instant timeout = now.minusSeconds(PROCESSING_STATUS_TIMEOUT_DURATION_SECS).truncatedTo(ChronoUnit.MILLIS);
         int isStatusUpdated = paymentRepository.claimProcessingStatus(paymentId, now, timeout);
         if (isStatusUpdated == 0) {
             // TODO i have to check again if the status is now CAPTURED or FAILED to be accurate to avoid retries
