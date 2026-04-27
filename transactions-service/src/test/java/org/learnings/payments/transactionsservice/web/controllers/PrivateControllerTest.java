@@ -1,6 +1,7 @@
 package org.learnings.payments.transactionsservice.web.controllers;
 
 import org.junit.jupiter.api.Test;
+import org.learnings.payments.transactionsservice.adapters.controllers.web.PrivateController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

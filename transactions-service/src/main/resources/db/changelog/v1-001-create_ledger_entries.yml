@@ -24,6 +24,8 @@ databaseChangeLog:
               - column:
                   name: event_id
                   type: UUID
+                  constraints:
+                    nullable: false
               - column:
                   name: payment_id
                   type: BIGINT
@@ -40,10 +42,20 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: currency
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+              - column:
                   name: reference_id
                   type: UUID
                   constraints:
                     nullable: true
+              - column:
+                  name: payment_occurred_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
               - column:
                   name: created_at
                   type: TIMESTAMP
