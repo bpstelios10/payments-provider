@@ -20,4 +20,7 @@
     </springProfile>
 
     <logger name="org.learnings.payments.transactionsservice" level="DEBUG" />
+    <logger name="org.apache.kafka" level="WARN" />
+    <logger name="kafka" level="WARN" />
+    <logger name="org.apache.zookeeper" level="WARN" />
 </configuration>

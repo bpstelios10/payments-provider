@@ -51,6 +51,14 @@ subprojects { subproj ->
 
         jar.enabled=false
         bootJar.archiveFileName='service.jar'
+
+        tasks.withType(Test).configureEach {
+            // Increase this to 1536m or 2048m for Embedded Kafka
+            maxHeapSize = "1024m"
+
+            // Reduces memory pressure by running tests sequentially
+//            maxParallelForks = 1
+        }
     }
 }
 
