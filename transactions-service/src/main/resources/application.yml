@@ -27,7 +27,7 @@ server:
 
 spring:
   datasource:
-    url: 'jdbc:h2:mem:transactions'
+    url: "jdbc:h2:mem:transactions;DB_CLOSE_DELAY=-1;TIME ZONE=UTC"
     driverClassName: 'org.h2.Driver'
     username: ${DB_USERNAME:dbuser}
     password: ${DB_PASSWORD:dbpass}
@@ -46,3 +46,7 @@ spring:
     change-log: classpath:/db/changelog/changelog-master.yml
     enabled: true
     contexts: dev
+
+kafka:
+  group-id: ledger-payment-event-consumer
+  bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9094}
