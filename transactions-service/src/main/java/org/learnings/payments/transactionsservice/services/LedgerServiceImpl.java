@@ -33,6 +33,7 @@ public class LedgerServiceImpl implements LedgerService {
             log.debug("ledger-entry found for event-id [{}]", existing.eventId());
         } catch (Exception ex) {
             log.error("Show me the error: [{}]", ex.getMessage());
+
             throw ex;
         }
     }

@@ -27,7 +27,7 @@ public class EventEnvelopeDeserializer implements Deserializer<EventEnvelope<?>>
 
     @Override
     public EventEnvelope<?> deserialize(String topic, byte[] data) {
-        if (data == null) return null;
+        if (data == null || data.length < 1) return null;
 
         try {
             // read tree to inspect eventType
@@ -45,7 +45,7 @@ public class EventEnvelopeDeserializer implements Deserializer<EventEnvelope<?>>
         }
     }
 
-    public static Class<?> resolve(EventType type) {
+    private static Class<?> resolve(EventType type) {
         Class<?> clazz = TYPES.get(type);
 
         if (clazz == null) {
