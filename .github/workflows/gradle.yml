@@ -12,14 +12,20 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  pages: write
+  id-token: write
+  actions: write
+
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
+      pull-requests: write
 
     steps:
+      # Checkout the code and set up Java 25
       - uses: actions/checkout@v6
       - name: Set up JDK 25
         uses: actions/setup-java@v5
@@ -27,17 +33,80 @@ jobs:
           java-version: '25'
           distribution: 'temurin'
 
+      # Build using the Gradle wrapper from the codebase
       - name: Build with Local Gradle Wrapper
         run: ./gradlew build # add -i for debug logs, in case of build failures
 
-      - name: Publish Test Report
+      ### Publish the HTML reports of junit and Jacoco, to be accessible with links from build summary! ###
+      - name: Prepare Combined Test+Jacoco Reports Folder
+        run: |
+          # module 1
+          mkdir -p public/${{ github.run_number }}/payments-service
+          cp -r payments-service/build/reports/tests/test public/${{ github.run_number }}/payments-service/junit
+          cp -r payments-service/build/reports/jacoco/test/html public/${{ github.run_number }}/payments-service/jacoco
+          # module 2
+          mkdir -p public/${{ github.run_number }}/transactions-service
+          cp -r transactions-service/build/reports/tests/test public/${{ github.run_number }}/transactions-service/junit
+          cp -r transactions-service/build/reports/jacoco/test/html public/${{ github.run_number }}/transactions-service/jacoco
+      - name: Deploy Reports to Pages (+ keep history)
+        uses: peaceiris/actions-gh-pages@v4 # https://github.com/peaceiris/actions-gh-pages#readme
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: public
+          keep_files: true
+      - name: Add Links in Build Summary Page
+        run: |
+          # module 1
+          echo "### PAYMENTS-SERVICE - Test Reports" >> $GITHUB_STEP_SUMMARY
+          echo "- JUnit: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}/payments-service/junit/index.html" >> $GITHUB_STEP_SUMMARY
+          echo "- JaCoCo: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}/payments-service/jacoco/index.html" >> $GITHUB_STEP_SUMMARY
+          # module 2
+          echo "### TRANSACTIONS-SERVICE - Test Reports" >> $GITHUB_STEP_SUMMARY
+          echo "- JUnit: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}/transactions-service/junit/index.html" >> $GITHUB_STEP_SUMMARY
+          echo "- JaCoCo: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/${{ github.run_number }}/transactions-service/jacoco/index.html" >> $GITHUB_STEP_SUMMARY
+
+      # Convert the XML files of test results into ctrf files, so that we can publish them in the pipeline summary page
+      - name: Convert Reports to CTRF
         if: always()
         run: |
-          # 1. Convert JUnit XML to CTRF JSON using a standard npm tool
-          npx junit-to-ctrf@v0.0.14 "**/build/test-results/test/*.xml" -u
+          # module 1
+          npx junit-to-ctrf "payments-service/build/test-results/**/*.xml" -o ctrf/payments-service-report.json
+          # module 2
+          npx junit-to-ctrf "transactions-service/build/test-results/**/*.xml" -o ctrf/transactions-service-report.json
+      - name: Publish Test Report
+        uses: ctrf-io/github-test-reporter@v1.0.27 # https://github.com/ctrf-io/github-test-reporter
+        if: always()
+        with:
+          report-path: 'ctrf/*.json'
+          insights-report: true
+          flaky-rate-report: true
+          fail-rate-report: true
+          slowest-report: true
+          # next lines are for comparing with previous reports
+          upload-artifact: true
+          fetch-previous-results: true
+          summary-delta-report: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-          # 2. Publish to Job Summary using the CTRF CLI (Actionless way)
-          npx github-actions-ctrf@0.0.58 ctrf/ctrf-report.json
+      # Add a comment in each PR with the coverage report. no checks are done here. checks for coverage are part of build
+      - name: JaCoCo Report
+        uses: madrapps/jacoco-report@v1.7.2 # https://github.com/marketplace/actions/jacoco-report
+        if: always()
+        id: jacoco
+        with:
+          title: Code Coverage Report
+          paths: |
+            # module 1
+            ${{ github.workspace }}/payments-service/build/reports/jacoco/test/jacocoTestReport.xml
+            # module 2
+            ${{ github.workspace }}/transactions-service/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          comment-type: both
+          update-comment: true
+          skip-if-no-changes: true
+          min-coverage-overall: 85
+          min-coverage-changed-files: 85
 
 #  dependency-submission:
 #
