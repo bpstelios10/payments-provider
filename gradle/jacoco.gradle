@@ -1,0 +1,48 @@
+apply plugin: 'jacoco'
+
+def excludedFromJacoco = [
+        "**/*ServiceApplication.class",
+        "**/*Dto.*",
+        "**/config/*"
+]
+
+check.dependsOn jacocoTestCoverageVerification
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = true
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: excludedFromJacoco)
+        }))
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    violationRules {
+        rule {
+            excludes = excludedFromJacoco
+
+            element = 'BUNDLE'
+            limit {
+                counter = 'INSTRUCTION' // bytecode precision
+                minimum = 0.87
+            }
+            limit {
+                counter = 'LINE' // most straight-forward to see
+                minimum = 0.86
+            }
+            limit {
+                counter = 'BRANCH' // is the hardest to 'cheat'
+                minimum = 0.76
+            }
+            limit {
+                counter = 'COMPLEXITY' // complex paths hits
+                minimum = 0.85
+            }
+        }
+    }
+}

@@ -28,6 +28,8 @@ subprojects { subproj ->
             sourceCompatibility = JavaVersion.VERSION_25
             targetCompatibility = JavaVersion.VERSION_25
         }
+
+        apply from: '../gradle/jacoco.gradle'
     }
 
     if (springWebProjects.contains(subproj.name)) {
