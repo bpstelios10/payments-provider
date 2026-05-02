@@ -29,19 +29,19 @@ jacocoTestCoverageVerification {
             element = 'BUNDLE'
             limit {
                 counter = 'INSTRUCTION' // bytecode precision
-                minimum = 0.87
+                minimum = 0.97
             }
             limit {
                 counter = 'LINE' // most straight-forward to see
-                minimum = 0.86
+                minimum = 0.96
             }
             limit {
                 counter = 'BRANCH' // is the hardest to 'cheat'
-                minimum = 0.76
+                minimum = 0.93
             }
             limit {
                 counter = 'COMPLEXITY' // complex paths hits
-                minimum = 0.85
+                minimum = 0.95
             }
         }
     }
