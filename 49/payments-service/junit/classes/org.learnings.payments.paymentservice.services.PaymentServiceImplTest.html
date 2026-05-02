@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - PaymentServiceImplTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>PaymentServiceImplTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.learnings.payments.paymentservice.services.html">org.learnings.payments.paymentservice.services</a> &gt; PaymentServiceImplTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">10</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.836s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">createPayment_succeeds()</td>
+<td class="success">createPayment_succeeds()</td>
+<td class="success">0.023s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">createPayment_whenOutboxSaveFails_throws()</td>
+<td class="success">createPayment_whenOutboxSaveFails_throws()</td>
+<td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">createPayment_whenUniqueConstraintErrorAndSameIdempotencyKey_returnsExistingPaymentId()</td>
+<td class="success">createPayment_whenUniqueConstraintErrorAndSameIdempotencyKey_returnsExistingPaymentId()</td>
+<td class="success">0.077s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">createPayment_whenUniqueConstraintErrorButDifferentIdempotencyKey_throwsTheException()</td>
+<td class="success">createPayment_whenUniqueConstraintErrorButDifferentIdempotencyKey_throwsTheException()</td>
+<td class="success">0.706s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">executePayment_succeeds()</td>
+<td class="success">executePayment_succeeds()</td>
+<td class="success">0.006s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">executePayment_whenPaymentAlreadyInProcessingStatus_throwsException()</td>
+<td class="success">executePayment_whenPaymentAlreadyInProcessingStatus_throwsException()</td>
+<td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[1] paymentStatus = CAPTURED</td>
+<td class="success">executePayment_whenPaymentAlreadyProcessed_returnsState(PaymentStatus)[1]</td>
+<td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[2] paymentStatus = FAILED</td>
+<td class="success">executePayment_whenPaymentAlreadyProcessed_returnsState(PaymentStatus)[2]</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">executePayment_whenPaymentNotFound_returnsNotFound()</td>
+<td class="success">executePayment_whenPaymentNotFound_returnsNotFound()</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">executePayment_whenPaymentsGatewayFails_returnsStatusFailed()</td>
+<td class="success">executePayment_whenPaymentsGatewayFails_returnsStatusFailed()</td>
+<td class="success">0.006s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre id="class-stdout">02-05-2026 14:24:19.238 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.getTransaction - Creating new transaction with name [org.learnings.payments.paymentservice.infrastructure.outbox.OutboxEventProcessor.processPendingEvents]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+02-05-2026 14:24:19.238 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.openSession - HHH006588: Opening session [tenant=null]
+02-05-2026 14:24:19.238 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doBegin - Opened new EntityManager [SessionImpl(140808547&lt;open&gt;)] for JPA transaction
+02-05-2026 14:24:19.238 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.begin - HHH006583: Beginning transaction
+02-05-2026 14:24:19.239 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doBegin - Exposing JPA transaction as JDBC [org.springframework.orm.jpa.vendor.HibernateJpaDialect$HibernateConnectionHandle@6a9c8ff8]
+02-05-2026 14:24:19.243 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.SQL.logStatement - SELECT * FROM outbox_event
+WHERE published = false
+  AND failed = false
+  AND next_retry_at &lt;= ?
+ORDER BY created_at
+LIMIT 100
+FOR UPDATE SKIP LOCKED
+Hibernate: SELECT * FROM outbox_event
+WHERE published = false
+  AND failed = false
+  AND next_retry_at &lt;= ?
+ORDER BY created_at
+LIMIT 100
+FOR UPDATE SKIP LOCKED
+02-05-2026 14:24:19.245 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.results.disallowPositionalSelections - Disallowing positional selections: SELECT * FROM outbox_event
+WHERE published = false
+  AND failed = false
+  AND next_retry_at &lt;= :now
+ORDER BY created_at
+LIMIT 100
+FOR UPDATE SKIP LOCKED
+02-05-2026 14:24:19.249 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.processCommit - Initiating transaction commit
+02-05-2026 14:24:19.249 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doCommit - Committing JPA transaction on EntityManager [SessionImpl(140808547&lt;open&gt;)]
+02-05-2026 14:24:19.249 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.commit - HHH006584: Committing transaction
+02-05-2026 14:24:19.250 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doCleanupAfterCompletion - Closing JPA EntityManager after transaction
+02-05-2026 14:24:19.250 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.session.metrics.end - HHH000401: Logging session metrics:
+	48330 ns acquiring 1 JDBC connections
+	0 ns releasing 0 JDBC connections
+	684956 ns preparing 1 JDBC statements
+	309737 ns executing 1 JDBC statements
+	0 ns executing 0 JDBC batches
+	0 ns performing 0 second-level cache puts
+	0 ns performing 0 second-level cache hits
+	0 ns performing 0 second-level cache misses
+	43181 ns executing 2 flushes (flushing a total of 0 entities and 0 collections)
+	0 ns executing 0 pre-partial-flushes
+	6262 ns executing 1 partial-flushes (flushing a total of 0 entities and 0 collections)
+
+02-05-2026 14:24:19.593 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.l.p.p.services.PaymentServiceImpl.createPayment - payment creation failed with error: [cause: UNIQUE_PAYMENT_IDEMPOTENCY_KEY]
+02-05-2026 14:24:19.676 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.l.p.p.services.PaymentServiceImpl.createPayment - payment creation failed with error: [cause: UNIQUE_PAYMENT_IDEMPOTENCY_KEY]
+02-05-2026 14:24:19.714 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.l.p.p.services.PaymentServiceImpl.createPayment - payment with id [1] created at [2026-05-02T14:24:19.694813561Z]
+</pre>
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.2.0</a> at May 2, 2026, 2:24:20 PM</p>
+</div>
+</div>
+</body>
+</html>
