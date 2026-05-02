@@ -73,11 +73,30 @@ jobs:
           npx junit-to-ctrf "payments-service/build/test-results/**/*.xml" -o ctrf/payments-service-report.json
           # module 2
           npx junit-to-ctrf "transactions-service/build/test-results/**/*.xml" -o ctrf/transactions-service-report.json
-      - name: Publish Test Report
+      - name: Publish Payments-Service Test Report
         uses: ctrf-io/github-test-reporter@v1.0.27 # https://github.com/ctrf-io/github-test-reporter
         if: always()
         with:
-          report-path: 'ctrf/*.json'
+          report-path: 'ctrf/payments-service-report.json'
+          title: 'Payments-Service Test Report'
+          artifact-name: 'payments-service-report'
+          insights-report: true
+          flaky-rate-report: true
+          fail-rate-report: true
+          slowest-report: true
+          # next lines are for comparing with previous reports
+          upload-artifact: true
+          fetch-previous-results: true
+          summary-delta-report: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish Transactions-Service Test Report
+        uses: ctrf-io/github-test-reporter@v1.0.27 # https://github.com/ctrf-io/github-test-reporter
+        if: always()
+        with:
+          report-path: 'ctrf/transactions-service-report.json'
+          title: 'Transactions-Service Test Report'
+          artifact-name: 'transactions-service-report'
           insights-report: true
           flaky-rate-report: true
           fail-rate-report: true
@@ -90,21 +109,30 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Add a comment in each PR with the coverage report. no checks are done here. checks for coverage are part of build
-      - name: JaCoCo Report
+      # module 1
+      - name: Payments-Service JaCoCo Report
         uses: madrapps/jacoco-report@v1.7.2 # https://github.com/marketplace/actions/jacoco-report
         if: always()
-        id: jacoco
         with:
-          title: Code Coverage Report
-          paths: |
-            # module 1
-            ${{ github.workspace }}/payments-service/build/reports/jacoco/test/jacocoTestReport.xml
-            # module 2
-            ${{ github.workspace }}/transactions-service/build/reports/jacoco/test/jacocoTestReport.xml
+          title: Payments-Service JaCoCo Report
+          paths: payments-service/build/reports/jacoco/test/jacocoTestReport.xml,
           token: ${{ secrets.GITHUB_TOKEN }}
           comment-type: both
           update-comment: true
-          skip-if-no-changes: true
+          skip-if-no-changes: false
+          min-coverage-overall: 85
+          min-coverage-changed-files: 85
+      # module 2
+      - name: Transactions-Service JaCoCo Report
+        uses: madrapps/jacoco-report@v1.7.2
+        if: always()
+        with:
+          title: Transactions-Service JaCoCo Report
+          paths: transactions-service/build/reports/jacoco/test/jacocoTestReport.xml
+          token: ${{ secrets.GITHUB_TOKEN }}
+          comment-type: both
+          update-comment: true
+          skip-if-no-changes: false
           min-coverage-overall: 85
           min-coverage-changed-files: 85
 
