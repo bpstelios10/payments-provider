@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - LedgerEntryComponentTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>LedgerEntryComponentTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.learnings.payments.transactionsservice.componenttests.html">org.learnings.payments.transactionsservice.componenttests</a> &gt; LedgerEntryComponentTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">1.169s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+<li>
+<a href="#">Standard error</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">shouldConsumeEventSerializedWithCorrectFormat()</td>
+<td class="success">1.169s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre id="class-stdout">02-05-2026 14:59:08.369 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.t.c.s.AnnotationConfigContextLoaderUtils.detectDefaultConfigurationClasses - Could not detect default configuration classes for test class [org.learnings.payments.transactionsservice.componenttests.LedgerEntryComponentTest]: LedgerEntryComponentTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+02-05-2026 14:59:08.372 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.b.t.c.SpringBootTestContextBootstrapper.getOrFindConfigurationClasses - Found @SpringBootConfiguration org.learnings.payments.transactionsservice.TransactionsServiceApplication for test class org.learnings.payments.transactionsservice.componenttests.LedgerEntryComponentTest
+02-05-2026 14:59:08.373 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.t.c.s.AnnotationConfigContextLoaderUtils.detectDefaultConfigurationClasses - Could not detect default configuration classes for test class [org.learnings.payments.transactionsservice.componenttests.LedgerEntryComponentTest]: LedgerEntryComponentTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+02-05-2026 14:59:08.374 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.b.t.c.SpringBootTestContextBootstrapper.getOrFindConfigurationClasses - Found @SpringBootConfiguration org.learnings.payments.transactionsservice.TransactionsServiceApplication for test class org.learnings.payments.transactionsservice.componenttests.LedgerEntryComponentTest
+02-05-2026 14:59:08.381 ?[35m[org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1]?[0;39m ?[34mINFO ?[0;39m o.s.k.l.KafkaMessageListenerContainer.info - test-group: partitions revoked: [PAYMENT_CAPTURED-0]
+02-05-2026 14:59:08.381 ?[35m[org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1]?[0;39m ?[34mINFO ?[0;39m o.s.k.l.KafkaMessageListenerContainer.info - ledger-payment-event-consumer: partitions revoked: [PAYMENT_CAPTURED-0]
+02-05-2026 14:59:08.762 ?[35m[org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1]?[0;39m ?[34mINFO ?[0;39m o.s.k.l.KafkaMessageListenerContainer.info - test-group: Consumer stopped
+02-05-2026 14:59:08.762 ?[35m[org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1]?[0;39m ?[34mINFO ?[0;39m o.s.k.l.KafkaMessageListenerContainer.info - ledger-payment-event-consumer: Consumer stopped
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::             (v4.1.0-M4)
+
+Bootstrap metadata: BootstrapMetadata(records=[ApiMessageAndVersion(FeatureLevelRecord(name='metadata.version', featureLevel=30) at version 0), ApiMessageAndVersion(FeatureLevelRecord(name='eligible.leader.replicas.version', featureLevel=1) at version 0), ApiMessageAndVersion(FeatureLevelRecord(name='group.version', featureLevel=1) at version 0), ApiMessageAndVersion(FeatureLevelRecord(name='share.version', featureLevel=1) at version 0), ApiMessageAndVersion(FeatureLevelRecord(name='streams.version', featureLevel=1) at version 0), ApiMessageAndVersion(FeatureLevelRecord(name='transaction.version', featureLevel=2) at version 0)], metadataVersionLevel=30, source=format command)
+Formatting metadata directory /tmp/kafka-17700132254750793197/combined_0_0 with metadata.version 4.3-IV0.
+02-05-2026 14:59:08.876 ?[35m[quorum-controller-0-event-handler]?[0;39m ?[31mWARN ?[0;39m o.a.k.controller.QuorumController.recordsForEmptyLog - [QuorumController id=0] Performing controller activation. The metadata log appears to be empty. Appending 6 bootstrap record(s) in metadata transaction at metadata.version 4.3-IV0 from bootstrap source 'testkit'.
+02-05-2026 14:59:09.002 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Transitioning 1 partition(s) to local leaders.
+02-05-2026 14:59:09.003 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition PAYMENT_CAPTURED-0 with topic id hXII46HhSjOC_zONhqG8mw.
+02-05-2026 14:59:09.006 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader PAYMENT_CAPTURED-0 with topic id Some(hXII46HhSjOC_zONhqG8mw) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.008 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.l.p.t.c.LedgerEntryComponentTest.logStarting - Starting LedgerEntryComponentTest using Java 25.0.2 with PID 2632 (started by runner in /home/runner/work/payments-provider/payments-provider/transactions-service)
+02-05-2026 14:59:09.009 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.l.p.t.c.LedgerEntryComponentTest.logStarting - Running with Spring Boot v4.1.0-M4, Spring v7.0.6
+02-05-2026 14:59:09.009 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.l.p.t.c.LedgerEntryComponentTest.logStartupProfileInfo - No active profile set, falling back to 1 default profile: &quot;default&quot;
+02-05-2026 14:59:09.206 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.d.r.c.RepositoryConfigurationDelegate.registerRepositoriesIn - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+02-05-2026 14:59:09.216 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.d.r.c.RepositoryConfigurationDelegate.registerRepositoriesIn - Finished Spring Data repository scanning in 8 ms. Found 1 JPA repository interface.
+02-05-2026 14:59:09.297 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m com.zaxxer.hikari.HikariDataSource.getConnection - HikariPool-2 - Starting...
+02-05-2026 14:59:09.299 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m com.zaxxer.hikari.pool.HikariPool.checkFailFast - HikariPool-2 - Added connection conn10: url=jdbc:h2:mem:transactions user=DBUSER
+02-05-2026 14:59:09.299 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m com.zaxxer.hikari.HikariDataSource.getConnection - HikariPool-2 - Start completed.
+02-05-2026 14:59:09.301 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m liquibase.database.log - Set default schema name to PUBLIC
+02-05-2026 14:59:09.328 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m liquibase.changelog.log - Reading from PUBLIC.DATABASECHANGELOG
+02-05-2026 14:59:09.339 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m liquibase.ui.log - Database is up to date, no changesets to execute
+02-05-2026 14:59:09.340 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m liquibase.changelog.log - Reading from PUBLIC.DATABASECHANGELOG
+02-05-2026 14:59:09.342 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m liquibase.util.log - UPDATE SUMMARY
+02-05-2026 14:59:09.342 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m liquibase.util.log - Run:                          0
+02-05-2026 14:59:09.342 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m liquibase.util.log - Previously run:               1
+02-05-2026 14:59:09.343 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m liquibase.util.log - Filtered out:                 0
+02-05-2026 14:59:09.343 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m liquibase.util.log - -------------------------------
+02-05-2026 14:59:09.343 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m liquibase.util.log - Total change sets:            1
+02-05-2026 14:59:09.344 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m liquibase.util.log - Update summary generated
+02-05-2026 14:59:09.344 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m liquibase.command.log - Command execution complete
+02-05-2026 14:59:09.358 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m org.hibernate.orm.jpa.logPersistenceUnitInformation - HHH008540: Processing PersistenceUnitInfo [name: default]
+02-05-2026 14:59:09.381 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.o.j.p.SpringPersistenceUnitInfo.addTransformer - No LoadTimeWeaver setup: ignoring JPA class transformer
+02-05-2026 14:59:09.383 ?[35m[Test worker]?[0;39m ?[31mWARN ?[0;39m org.hibernate.orm.core.checkVersion - HHH000511: The 2.4.240 version for [org.hibernate.dialect.PostgreSQLDialect] is no longer supported, hence certain features may not work properly.The minimum supported version is 13.0.0. Check the community dialects project for available legacy versions.
+02-05-2026 14:59:09.383 ?[35m[Test worker]?[0;39m ?[31mWARN ?[0;39m org.hibernate.orm.deprecation.constructDialect - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+02-05-2026 14:59:09.383 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.hibernate.orm.connections.pooling.logConnectionInfo - HHH10001005: Database info:
+	Database JDBC URL [jdbc:h2:mem:transactions]
+	Database driver: H2 JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 2.4.240
+	Default catalog/schema: TRANSACTIONS/PUBLIC
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: 100
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+02-05-2026 14:59:09.419 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m org.hibernate.orm.core.initiateService - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: set client_min_messages = WARNING
+02-05-2026 14:59:09.420 ?[35m[Test worker]?[0;39m ?[31mWARN ?[0;39m o.h.t.s.i.ExceptionHandlerLoggedImpl.handleException - GenerationTarget encountered exception accepting command : Error executing DDL &quot;set client_min_messages = WARNING&quot; via JDBC [Syntax error in SQL statement &quot;set [*]client_min_messages = WARNING&quot;; expected &quot;@, AUTOCOMMIT, EXCLUSIVE, IGNORECASE, PASSWORD, SALT, MODE, DATABASE, COLLATION, CLUSTER, DATABASE_EVENT_LISTENER, ALLOW_LITERALS, DEFAULT_TABLE_TYPE, SCHEMA, CATALOG, SCHEMA_SEARCH_PATH, JAVA_OBJECT_SERIALIZER, IGNORE_CATALOGS, SESSION, TRANSACTION, TIME, NON_KEYWORDS, DEFAULT_NULL_ORDERING&quot;;]
+org.hibernate.tool.schema.spi.CommandAcceptanceException: Error executing DDL &quot;set client_min_messages = WARNING&quot; via JDBC [Syntax error in SQL statement &quot;set [*]client_min_messages = WARNING&quot;; expected &quot;@, AUTOCOMMIT, EXCLUSIVE, IGNORECASE, PASSWORD, SALT, MODE, DATABASE, COLLATION, CLUSTER, DATABASE_EVENT_LISTENER, ALLOW_LITERALS, DEFAULT_TABLE_TYPE, SCHEMA, CATALOG, SCHEMA_SEARCH_PATH, JAVA_OBJECT_SERIALIZER, IGNORE_CATALOGS, SESSION, TRANSACTION, TIME, NON_KEYWORDS, DEFAULT_NULL_ORDERING&quot;;]
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:81)
+	at org.hibernate.tool.schema.internal.Helper.applySqlString(Helper.java:218)
+	at org.hibernate.tool.schema.internal.SchemaDropperImpl.dropFromMetadata(SchemaDropperImpl.java:205)
+	at org.hibernate.tool.schema.internal.SchemaDropperImpl.performDrop(SchemaDropperImpl.java:182)
+	at org.hibernate.tool.schema.internal.SchemaDropperImpl.doDrop(SchemaDropperImpl.java:152)
+	at org.hibernate.tool.schema.internal.SchemaDropperImpl.doDrop(SchemaDropperImpl.java:112)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.performDatabaseAction(SchemaManagementToolCoordinator.java:227)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.lambda$process$1(SchemaManagementToolCoordinator.java:101)
+	at java.base/java.util.HashMap.forEach(HashMap.java:1430)
+	at org.hibernate.tool.schema.spi.SchemaManagementToolCoordinator.process(SchemaManagementToolCoordinator.java:100)
+	at org.hibernate.boot.internal.SessionFactoryObserverForSchemaExport.sessionFactoryCreated(SessionFactoryObserverForSchemaExport.java:35)
+	at org.hibernate.internal.SessionFactoryObserverChain.sessionFactoryCreated(SessionFactoryObserverChain.java:33)
+	at org.hibernate.internal.SessionFactoryImpl.&lt;init&gt;(SessionFactoryImpl.java:323)
+	at org.hibernate.internal.SessionFactoryRegistry.instantiateSessionFactory(SessionFactoryRegistry.java:64)
+	at org.hibernate.boot.internal.SessionFactoryBuilderImpl.build(SessionFactoryBuilderImpl.java:437)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1456)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:93)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:443)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:436)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:411)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:419)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1864)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1813)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:603)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:525)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:371)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:331)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:201)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:977)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:621)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:756)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:445)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:321)
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$2(SpringBootContextLoader.java:155)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46)
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1465)
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:600)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:155)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:114)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:247)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.lambda$loadContext$0(DefaultCacheAwareContextLoaderDelegate.java:167)
+	at org.springframework.test.context.cache.DefaultContextCache.put(DefaultContextCache.java:214)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:160)
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:128)
+	at org.springframework.test.context.junit.jupiter.SpringExtension.getApplicationContext(SpringExtension.java:423)
+	at org.springframework.test.context.junit.jupiter.SpringExtension.resolveParameter(SpringExtension.java:398)
+	at org.junit.jupiter.engine.execution.ParameterResolutionUtils.resolveParameter(ParameterResolutionUtils.java:155)
+	at org.junit.jupiter.engine.execution.ParameterResolutionUtils.resolveParameters(ParameterResolutionUtils.java:122)
+	at org.junit.jupiter.engine.execution.ParameterResolutionUtils.resolveParameters(ParameterResolutionUtils.java:66)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invoke(InterceptingExecutableInvoker.java:96)
+	at org.junit.jupiter.engine.execution.InterceptingExecutableInvoker.invokeVoid(InterceptingExecutableInvoker.java:71)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeBeforeAllMethods$0(ClassBasedTestDescriptor.java:448)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeBeforeAllMethods(ClassBasedTestDescriptor.java:446)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.before(ClassBasedTestDescriptor.java:251)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.before(ClassBasedTestDescriptor.java:88)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:173)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:42)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$2(NodeTestTask.java:180)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$1(NodeTestTask.java:166)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:138)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$0(NodeTestTask.java:164)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:74)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:163)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:116)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:36)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:52)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:58)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.executeEngine(EngineExecutionOrchestrator.java:246)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.failOrExecuteEngine(EngineExecutionOrchestrator.java:218)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:179)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:108)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:66)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:157)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:65)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:125)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:114)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:93)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:48)
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$0(InterceptingLauncher.java:41)
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:40)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:48)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.processAllTestClasses(JUnitPlatformTestClassProcessor.java:135)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor$CollectAllTestClassesExecutor.access$000(JUnitPlatformTestClassProcessor.java:110)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestClassProcessor.stop(JUnitPlatformTestClassProcessor.java:104)
+	at org.gradle.api.internal.tasks.testing.SuiteTestClassProcessor.stop(SuiteTestClassProcessor.java:64)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at org.gradle.internal.dispatch.MethodInvocation.invokeOn(MethodInvocation.java:77)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:28)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:19)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:88)
+	at jdk.proxy2/jdk.proxy2.$Proxy6.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:194)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:126)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:122)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:72)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+Caused by: org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement &quot;set [*]client_min_messages = WARNING&quot;; expected &quot;@, AUTOCOMMIT, EXCLUSIVE, IGNORECASE, PASSWORD, SALT, MODE, DATABASE, COLLATION, CLUSTER, DATABASE_EVENT_LISTENER, ALLOW_LITERALS, DEFAULT_TABLE_TYPE, SCHEMA, CATALOG, SCHEMA_SEARCH_PATH, JAVA_OBJECT_SERIALIZER, IGNORE_CATALOGS, SESSION, TRANSACTION, TIME, NON_KEYWORDS, DEFAULT_NULL_ORDERING&quot;; SQL statement:
+set client_min_messages = WARNING [42001-240]
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:514)
+	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
+	at org.h2.message.DbException.getSyntaxError(DbException.java:261)
+	at org.h2.command.ParserBase.getSyntaxError(ParserBase.java:762)
+	at org.h2.command.Parser.parseSet(Parser.java:7696)
+	at org.h2.command.Parser.parsePrepared(Parser.java:617)
+	at org.h2.command.Parser.parse(Parser.java:584)
+	at org.h2.command.Parser.parse(Parser.java:564)
+	at org.h2.command.Parser.prepareCommand(Parser.java:487)
+	at org.h2.engine.SessionLocal.prepareLocal(SessionLocal.java:647)
+	at org.h2.engine.SessionLocal.prepareCommand(SessionLocal.java:563)
+	at org.h2.jdbc.JdbcConnection.prepareCommand(JdbcConnection.java:1160)
+	at org.h2.jdbc.JdbcStatement.executeInternal(JdbcStatement.java:245)
+	at org.h2.jdbc.JdbcStatement.execute(JdbcStatement.java:231)
+	at com.zaxxer.hikari.pool.ProxyStatement.execute(ProxyStatement.java:95)
+	at com.zaxxer.hikari.pool.HikariProxyStatement.execute(HikariProxyStatement.java)
+	at org.hibernate.tool.schema.internal.exec.GenerationTargetToDatabase.accept(GenerationTargetToDatabase.java:76)
+	... 114 common frames omitted
+Hibernate: drop table if exists ledger_entries cascade
+Hibernate: create table ledger_entries (amount numeric(19,2) not null, created_at timestamp(6) with time zone, payment_id bigint not null, payment_occurred_at timestamp(6) with time zone, event_id uuid not null, id uuid not null, reference_id uuid, currency varchar(255), type varchar(255) not null check ((type in ('CAPTURED'))), primary key (id), constraint UNIQUE_LEDGER_ENTRY_IDEMPOTENCY_KEY unique (event_id))
+02-05-2026 14:59:09.426 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.o.j.LocalContainerEntityManagerFactoryBean.buildNativeEntityManagerFactory - Initialized JPA EntityManagerFactory for persistence unit 'default'
+02-05-2026 14:59:09.467 ?[35m[Test worker]?[0;39m ?[31mWARN ?[0;39m o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration.openEntityManagerInViewInterceptor - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+02-05-2026 14:59:09.635 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.l.p.t.c.LedgerEntryComponentTest.logStarted - Started LedgerEntryComponentTest in 0.87 seconds (process running for 17.575)
+02-05-2026 14:59:09.669 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Transitioning 50 partition(s) to local leaders.
+02-05-2026 14:59:09.670 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-13 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.676 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-13 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.679 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-46 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.682 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-46 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.685 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-9 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.687 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-9 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.688 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-42 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.690 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-42 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.692 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-21 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.694 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-21 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.696 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-17 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.698 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-17 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.699 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-30 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.702 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-30 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.703 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-26 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.705 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-26 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.706 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-5 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.709 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-5 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.710 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-38 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.712 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-38 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.714 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-1 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.716 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-1 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.717 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-34 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.719 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-34 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.720 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-16 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.722 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-16 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.723 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-45 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.725 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-45 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.726 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-12 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.728 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-12 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.729 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-41 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.731 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-41 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.732 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-24 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.734 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-24 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.735 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-20 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.737 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-20 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.738 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-49 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.740 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-49 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.741 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-0 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.743 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-0 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.744 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-29 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.746 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-29 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.748 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-25 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.750 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-25 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.752 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-8 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.755 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-8 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.760 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-37 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.764 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-37 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.767 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-4 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.769 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-4 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.771 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-33 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.773 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-33 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.774 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-15 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.776 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-15 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.778 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-48 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.779 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-48 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.780 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-11 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.782 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-11 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.783 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-44 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.785 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-44 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.788 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-23 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.790 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-23 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.791 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-19 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.793 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-19 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.794 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-32 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.796 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-32 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.798 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-28 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.800 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-28 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.801 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-7 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.803 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-7 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.804 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-40 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.805 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-40 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.806 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-3 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.808 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-3 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.809 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-36 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.810 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-36 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.812 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-47 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.814 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-47 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.816 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-14 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.818 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-14 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.819 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-43 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.821 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-43 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.822 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-10 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.824 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-10 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.825 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-22 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.826 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-22 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.828 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-18 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.830 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-18 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.831 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-31 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.832 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-31 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.833 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-27 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.835 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-27 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.836 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-39 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.837 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-39 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.838 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-6 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.840 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-6 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.841 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-35 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.842 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-35 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.843 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Creating new partition __consumer_offsets-2 with topic id Slut53veSQ2taalI3lIXhA.
+02-05-2026 14:59:09.845 ?[35m[kafka-0-metadata-loader-event-handler]?[0;39m ?[34mINFO ?[0;39m state.change.logger.info - [Broker id=0] Leader __consumer_offsets-2 with topic id Some(Slut53veSQ2taalI3lIXhA) starts at leader epoch 0 from offset 0 with partition epoch 0, high watermark 0, ISR [0], adding replicas [] and removing replicas [] . Previous leader None and previous leader epoch was -1.
+02-05-2026 14:59:09.891 ?[35m[org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1]?[0;39m ?[34mINFO ?[0;39m o.s.k.l.KafkaMessageListenerContainer.info - ledger-payment-event-consumer: partitions assigned: [PAYMENT_CAPTURED-0]
+02-05-2026 14:59:10.000 ?[35m[org.springframework.kafka.KafkaListenerEndpointContainer#1-0-C-1]?[0;39m ?[34mINFO ?[0;39m o.s.k.l.KafkaMessageListenerContainer.info - test-group: partitions assigned: [PAYMENT_CAPTURED-0]
+02-05-2026 14:59:10.115 ?[35m[org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1]?[0;39m ?[39mDEBUG?[0;39m o.l.p.t.a.m.PaymentCapturedEventConsumer.consume - *** Received payment captured event: [EventEnvelope[eventId=95bb32b6-d9a9-43a2-a076-9274bd1bc180, eventType=PAYMENT_CAPTURED, payload=PaymentEventPayload[paymentId=123, amount=42.50, currency=EUR, occurredAt=2026-05-02T14:59:04.964Z], occurredAt=2026-05-02T14:59:09.964Z]]
+02-05-2026 14:59:10.117 ?[35m[org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1]?[0;39m ?[39mDEBUG?[0;39m o.l.p.t.services.LedgerServiceImpl.process - Processing ledger entry [LedgerEntryDto[eventId=95bb32b6-d9a9-43a2-a076-9274bd1bc180, paymentId=123, type=CAPTURED, amount=42.50, currency=EUR, referenceId=null, paymentOccurredAt=2026-05-02T14:59:04.964Z]]
+Hibernate: insert into ledger_entries (amount,created_at,currency,event_id,payment_id,payment_occurred_at,reference_id,type,id) values (?,?,?,?,?,?,?,?,?)
+Hibernate: select le1_0.id,le1_0.amount,le1_0.created_at,le1_0.currency,le1_0.event_id,le1_0.payment_id,le1_0.payment_occurred_at,le1_0.reference_id,le1_0.type from ledger_entries le1_0 where le1_0.event_id=?
+</pre>
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
+</span>
+</div>
+<div class="tab">
+<h2>Standard error</h2>
+<span class="code">
+<pre id="class-stderr">14:59:08,789 |-WARN in Logger[org.apache.kafka.coordinator.common.runtime.MultiThreadedEventProcessor$EventProcessorThread] - No appenders present in context [default] for logger [org.apache.kafka.coordinator.common.runtime.MultiThreadedEventProcessor$EventProcessorThread].
+</pre>
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stderr">Copy</button>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.2.0</a> at May 2, 2026, 2:59:18 PM</p>
+</div>
+</div>
+</body>
+</html>
