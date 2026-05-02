@@ -46,12 +46,6 @@ public class EventEnvelopeDeserializer implements Deserializer<EventEnvelope<?>>
     }
 
     private static Class<?> resolve(EventType type) {
-        Class<?> clazz = TYPES.get(type);
-
-        if (clazz == null) {
-            throw new IllegalArgumentException("No payload mapping for: " + type);
-        }
-
-        return clazz;
+        return TYPES.get(type);
     }
 }
