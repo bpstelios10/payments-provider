@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentServiceImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payments-service</a> &gt; <a href="index.source.html" class="el_package">org.learnings.payments.paymentservice.services</a> &gt; <span class="el_source">PaymentServiceImpl.java</span></div><h1>PaymentServiceImpl.java</h1><pre class="source lang-java linenums">package org.learnings.payments.paymentservice.services;
+
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.learnings.payments.paymentservice.domain.Payment;
+import org.learnings.payments.paymentservice.domain.PaymentStatus;
+import org.learnings.payments.paymentservice.domain.PaymentStatusAction;
+import org.learnings.payments.paymentservice.repositories.PaymentRepository;
+import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
+import org.learnings.payments.paymentservice.services.ports.EventMessage;
+import org.learnings.payments.paymentservice.services.ports.EventMessagePublisher;
+import org.learnings.payments.paymentservice.services.statustransitions.PaymentActionStrategy;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.web.server.ResponseStatusException;
+import tools.jackson.databind.json.JsonMapper;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
+
+import static org.learnings.payments.paymentservice.domain.PaymentStatus.INITIATED;
+import static org.learnings.payments.paymentservice.domain.PaymentStatus.PROCESSING;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+
+<span class="fc" id="L30">@Slf4j</span>
+@Service
+public class PaymentServiceImpl implements PaymentService {
+
+    @Value(&quot;${service.processing-status-timeout-seconds:10}&quot;) private int PROCESSING_STATUS_TIMEOUT_DURATION_SECS;
+    private final PaymentRepository paymentRepository;
+    private final EventMessagePublisher eventMessagePublisher;
+    private final JsonMapper jsonMapper;
+    private final List&lt;PaymentActionStrategy&gt; paymentActionStrategies;
+    private final PaymentGateway paymentGateway;
+    private final TransactionTemplate transactionTemplate;
+
+    public PaymentServiceImpl(PaymentRepository paymentRepository, EventMessagePublisher eventMessagePublisher,
+                              JsonMapper jsonMapper, List&lt;PaymentActionStrategy&gt; paymentActionStrategies,
+<span class="fc" id="L44">                              PaymentGateway paymentGateway, TransactionTemplate transactionTemplate) {</span>
+<span class="fc" id="L45">        this.paymentRepository = paymentRepository;</span>
+<span class="fc" id="L46">        this.eventMessagePublisher = eventMessagePublisher;</span>
+<span class="fc" id="L47">        this.jsonMapper = jsonMapper;</span>
+<span class="fc" id="L48">        this.paymentActionStrategies = paymentActionStrategies;</span>
+<span class="fc" id="L49">        this.paymentGateway = paymentGateway;</span>
+<span class="fc" id="L50">        this.transactionTemplate = transactionTemplate;</span>
+<span class="fc" id="L51">    }</span>
+
+    /*
+     * we cant mark this method as Transactional cause in case of failure, the transaction is marked for rollback. but
+     * then in the catch block, we need to do another payment request, but the transaction is now dirty. issues!
+     * we resolve by using saveAndAudit for atomicity. we use TransactionTemplate in there, to keep the transaction
+     * scope narrower, inside the saveAndAudit method only. (cant mark saveAndAudit as Transactional cause it is private
+     * and internal method). Now, the catch block is safe. We use the repo, so another independent transaction, in there
+     */
+    @Override
+    public PaymentDto createPayment(PaymentDto paymentDto) {
+<span class="fc" id="L62">        Payment payment = PaymentDto.toPayment(paymentDto, INITIATED);</span>
+        Payment savedPayment;
+
+        try {
+<span class="fc" id="L66">            savedPayment = saveAndAudit(payment, INITIATED);</span>
+<span class="fc" id="L67">            log.debug(&quot;payment with id [{}] created at [{}]&quot;, savedPayment.getPaymentId(), savedPayment.getCreatedDate());</span>
+<span class="fc" id="L68">        } catch (DataIntegrityViolationException dae) {</span>
+<span class="fc" id="L69">            log.debug(&quot;payment creation failed with error: [{}]&quot;, dae.getMessage());</span>
+<span class="fc" id="L70">            Optional&lt;Payment&gt; byIdempotencyKey = paymentRepository.findByIdempotencyKey(paymentDto.getIdempotencyKey());</span>
+
+<span class="fc" id="L72">            return PaymentDto.fromPayment(byIdempotencyKey.orElseThrow(() -&gt; dae));</span>
+<span class="fc" id="L73">        }</span>
+
+<span class="fc" id="L75">        return PaymentDto.fromPayment(savedPayment);</span>
+    }
+
+    // This method is not annotated as transactional cause the rest call will keep it open for a long time
+    // so we make it atomic by using Status and no need to rollback in any case of failure.
+    // this is achieved with the PROCESSING status with a timestamp and using idempotency-key on the downstream call.
+    @Override
+    public PaymentDto executePayment(long paymentId) {
+<span class="fc" id="L83">        PaymentDto paymentDto = getPaymentDtoById(paymentId);</span>
+
+        // return fast, if it is not in valid state for processing
+<span class="fc" id="L86">        Optional&lt;PaymentStatus&gt; processingStatus = getNextStatus(paymentDto.getStatus(), PaymentStatusAction.START_PROCESSING);</span>
+<span class="fc bfc" id="L87" title="All 2 branches covered.">        if (processingStatus.isEmpty()) {</span>
+<span class="fc" id="L88">            return paymentDto;</span>
+        }
+
+<span class="fc" id="L91">        lockPaymentBySettingStatusProcessing(paymentId);</span>
+
+<span class="fc" id="L93">        PaymentStatus currentStatus = PROCESSING;</span>
+<span class="fc" id="L94">        PaymentStatusAction nextAction = PaymentStatusAction.CAPTURE;</span>
+
+        try {
+<span class="fc" id="L97">            paymentGateway.executePayment(paymentDto, paymentDto.getIdempotencyKey());</span>
+<span class="fc" id="L98">        } catch (Exception ex) {</span>
+            // TODO not all payment failures should be failed. eg timeouts, etc should remain processing
+<span class="fc" id="L100">            nextAction = PaymentStatusAction.FAIL;</span>
+<span class="fc" id="L101">        }</span>
+
+        // TODO if this update fails, then something weird is happening. might need to throw some error.
+        //  will also need to check this so later only 1 thread is allowed to do things like notifications, etc
+<span class="fc" id="L105">        PaymentStatusAction finalNextAction = nextAction;</span>
+<span class="fc" id="L106">        PaymentStatus nextStatus = getNextStatus(currentStatus, nextAction)</span>
+<span class="pc" id="L107">                .orElseThrow(() -&gt; new IllegalStateException(&quot;No handler for [&quot; + currentStatus + &quot; + &quot; + finalNextAction + &quot;]&quot;));</span>
+
+<span class="fc" id="L109">        paymentRepository.setStatusIfCurrentStatusIs(paymentId, nextStatus, currentStatus);</span>
+
+<span class="fc" id="L111">        Payment updated = paymentRepository.findById(paymentId).orElseThrow();</span>
+
+<span class="fc" id="L113">        return PaymentDto.fromPayment(updated);</span>
+    }
+
+    @SuppressWarnings(&quot;SameParameterValue&quot;)
+    private Payment saveAndAudit(Payment payment, PaymentStatus paymentStatus) {
+<span class="fc" id="L118">        return transactionTemplate.execute(_ -&gt; {</span>
+<span class="fc" id="L119">            Payment saved = paymentRepository.save(payment);</span>
+
+<span class="fc" id="L121">            EventMessage event = new EventMessage(saved.getPaymentId(), &quot;PAYMENT&quot;, paymentStatus.name(),</span>
+<span class="fc" id="L122">                    jsonMapper.writeValueAsString(saved));</span>
+<span class="fc" id="L123">            eventMessagePublisher.publish(event);</span>
+
+<span class="fc" id="L125">            return saved;</span>
+        });
+    }
+
+    private @NonNull PaymentDto getPaymentDtoById(long paymentId) {
+<span class="fc" id="L130">        Payment payment = paymentRepository</span>
+<span class="fc" id="L131">                .findById(paymentId)</span>
+<span class="fc" id="L132">                .orElseThrow(() -&gt;</span>
+<span class="fc" id="L133">                        new ResponseStatusException(NOT_FOUND, &quot;Payment with id [&quot; + paymentId + &quot;] does not exist&quot;));</span>
+<span class="fc" id="L134">        return PaymentDto.fromPayment(payment);</span>
+    }
+
+    private void lockPaymentBySettingStatusProcessing(long paymentId) {
+<span class="fc" id="L138">        Instant now = Instant.now().truncatedTo(ChronoUnit.MILLIS);</span>
+<span class="fc" id="L139">        Instant timeout = now.minusSeconds(PROCESSING_STATUS_TIMEOUT_DURATION_SECS).truncatedTo(ChronoUnit.MILLIS);</span>
+<span class="fc" id="L140">        int isStatusUpdated = paymentRepository.claimProcessingStatus(paymentId, now, timeout);</span>
+<span class="fc bfc" id="L141" title="All 2 branches covered.">        if (isStatusUpdated == 0) {</span>
+            // TODO i have to check again if the status is now CAPTURED or FAILED to be accurate to avoid retries
+<span class="fc" id="L143">            throw new ObjectOptimisticLockingFailureException(Payment.class, paymentId);</span>
+        }
+<span class="fc" id="L145">    }</span>
+
+    private Optional&lt;PaymentStatus&gt; getNextStatus(PaymentStatus currentStatus, PaymentStatusAction nextAction) {
+<span class="fc" id="L148">        Optional&lt;PaymentActionStrategy&gt; paymentActionStrategy = paymentActionStrategies.stream()</span>
+<span class="fc" id="L149">                .filter(s -&gt; s.supports(currentStatus, nextAction))</span>
+<span class="fc" id="L150">                .findFirst();</span>
+
+<span class="fc" id="L152">        return paymentActionStrategy.map(PaymentActionStrategy::getNextState);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
