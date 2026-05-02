@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PaymentsController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payments-service</a> &gt; <a href="index.source.html" class="el_package">org.learnings.payments.paymentservice.web.controllers</a> &gt; <span class="el_source">PaymentsController.java</span></div><h1>PaymentsController.java</h1><pre class="source lang-java linenums">package org.learnings.payments.paymentservice.web.controllers;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import org.learnings.payments.paymentservice.domain.PaymentStatus;
+import org.learnings.payments.paymentservice.services.PaymentService;
+import org.learnings.payments.paymentservice.services.dtos.PaymentDto;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.ServiceConfigurationError;
+import java.util.UUID;
+
+import static org.learnings.payments.paymentservice.web.controllers.PaymentsController.PaymentResponse.fromPaymentDto;
+
+@RestController
+@RequestMapping(&quot;payments&quot;)
+public class PaymentsController {
+
+    private final PaymentService paymentService;
+
+<span class="fc" id="L29">    public PaymentsController(PaymentService paymentService) {</span>
+<span class="fc" id="L30">        this.paymentService = paymentService;</span>
+<span class="fc" id="L31">    }</span>
+
+    @PostMapping
+    public ResponseEntity&lt;PaymentResponse&gt; createPayment(@Valid @NotNull @RequestBody CreatePayment requestBody) {
+<span class="fc" id="L35">        PaymentDto paymentDto = CreatePayment.toPaymentDto(requestBody);</span>
+
+<span class="fc" id="L37">        PaymentDto responseDto = paymentService.createPayment(paymentDto);</span>
+
+<span class="fc" id="L39">        return ResponseEntity.ok(fromPaymentDto(responseDto));</span>
+    }
+
+    @PostMapping(&quot;/{paymentId}/execute&quot;)
+    public ResponseEntity&lt;PaymentResponse&gt; executePayment(@PathVariable Long paymentId) {
+<span class="fc" id="L44">        PaymentDto responseDto = paymentService.executePayment(paymentId);</span>
+
+<span class="fc" id="L46">        return ResponseEntity.ok(fromPaymentDto(responseDto));</span>
+    }
+
+    @SuppressWarnings({&quot;UnusedDeclaration&quot;})
+    @ResponseStatus(value= HttpStatus.CONFLICT, reason=&quot;Race condition error&quot;)
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+<span class="fc" id="L52">    public void conflict() { }</span>
+
+    // adding this for now for the tests. Exception handling will happen later
+    @SuppressWarnings({&quot;UnusedDeclaration&quot;})
+    @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR, reason=&quot;Uncaught Exception&quot;)
+    @ExceptionHandler(ServiceConfigurationError.class)
+<span class="fc" id="L58">    public void handleServiceConfigurationError() { }</span>
+
+    // adding this for now for the tests. Exception handling will happen later
+    @SuppressWarnings({&quot;UnusedDeclaration&quot;})
+    @ResponseStatus(value= HttpStatus.INTERNAL_SERVER_ERROR, reason=&quot;Uncaught Exception&quot;)
+    @ExceptionHandler(DataAccessException.class)
+<span class="fc" id="L64">    public void handleDataAccessException() { }</span>
+
+<span class="fc" id="L66">    public record CreatePayment(</span>
+            @NotNull
+            @DecimalMin(value = &quot;0.00&quot;, inclusive = false)
+            @Digits(integer = 17, fraction = 2)
+            BigDecimal amount,
+            String currency,
+            @NotEmpty
+            String merchantId,
+            @NotNull
+            UUID idempotencyKey) {
+        static PaymentDto toPaymentDto(CreatePayment requestBody) {
+            // TODO should be checking not empty, not just null
+<span class="fc bfc" id="L78" title="All 2 branches covered.">            String currency = requestBody.currency == null ? &quot;USD&quot; : requestBody.currency;</span>
+<span class="fc" id="L79">            return new PaymentDto(requestBody.amount, currency, requestBody.merchantId, requestBody.idempotencyKey, null);</span>
+        }
+    }
+
+<span class="fc" id="L83">    public record PaymentResponse(Long paymentId, PaymentStatus status) {</span>
+        static PaymentResponse fromPaymentDto(PaymentDto paymentDto) {
+<span class="fc" id="L85">            return new PaymentResponse(paymentDto.getPaymentId(), paymentDto.getStatus());</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
