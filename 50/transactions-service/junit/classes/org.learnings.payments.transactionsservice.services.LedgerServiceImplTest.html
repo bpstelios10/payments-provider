@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - LedgerServiceImplTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>LedgerServiceImplTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.learnings.payments.transactionsservice.services.html">org.learnings.payments.transactionsservice.services</a> &gt; LedgerServiceImplTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">4</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.318s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">process_whenDataIntegrityViolationAndEntryFound_logsAndContinues()</td>
+<td class="success">0.006s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">process_whenDataIntegrityViolationAndEntryNotFound_throwsException()</td>
+<td class="success">0.003s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">process_whenOtherException_throwsException()</td>
+<td class="success">0.002s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">process_whenSaveSucceeds_savesLedgerEntry()</td>
+<td class="success">0.307s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre id="class-stdout">02-05-2026 14:35:11.644 ?[35m[org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1]?[0;39m ?[31mWARN ?[0;39m o.apache.kafka.clients.NetworkClient.processDisconnection - [Consumer clientId=consumer-ledger-payment-event-consumer-5, groupId=ledger-payment-event-consumer] Connection to node -1 (localhost/127.0.0.1:9094) could not be established. Node may not be available.
+02-05-2026 14:35:11.646 ?[35m[org.springframework.kafka.KafkaListenerEndpointContainer#0-0-C-1]?[0;39m ?[31mWARN ?[0;39m o.apache.kafka.clients.NetworkClient.handleServerDisconnect - [Consumer clientId=consumer-ledger-payment-event-consumer-5, groupId=ledger-payment-event-consumer] Bootstrap broker localhost:9094 (id: -1 rack: null isFenced: false) disconnected
+02-05-2026 14:35:11.821 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.l.p.t.services.LedgerServiceImpl.process - Processing ledger entry [LedgerEntryDto[eventId=6ac548a4-a9db-49de-ba4d-d6bdb04f599d, paymentId=123, type=CAPTURED, amount=100.0, currency=USD, referenceId=null, paymentOccurredAt=2026-05-02T14:35:11.818568477Z]]
+02-05-2026 14:35:11.828 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.l.p.t.services.LedgerServiceImpl.process - Processing ledger entry [LedgerEntryDto[eventId=d38908c3-dcfc-4d0e-be4f-7cf8d4c9b91b, paymentId=123, type=CAPTURED, amount=100.0, currency=USD, referenceId=null, paymentOccurredAt=2026-05-02T14:35:11.824718503Z]]
+02-05-2026 14:35:11.829 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.l.p.t.services.LedgerServiceImpl.process - ledger-entry creation failed with error: [null]
+02-05-2026 14:35:11.830 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.l.p.t.services.LedgerServiceImpl.process - ledger-entry found for event-id [d38908c3-dcfc-4d0e-be4f-7cf8d4c9b91b]
+02-05-2026 14:35:11.833 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.l.p.t.services.LedgerServiceImpl.process - Processing ledger entry [LedgerEntryDto[eventId=eb7b7095-591b-4fc7-80fd-6c8c5b418865, paymentId=123, type=CAPTURED, amount=100.0, currency=USD, referenceId=null, paymentOccurredAt=2026-05-02T14:35:11.831848382Z]]
+02-05-2026 14:35:11.833 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.l.p.t.services.LedgerServiceImpl.process - ledger-entry creation failed with error: [oops]
+02-05-2026 14:35:11.836 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.l.p.t.services.LedgerServiceImpl.process - Processing ledger entry [LedgerEntryDto[eventId=6e0ed14e-91b7-4808-9b5f-4192605aa23b, paymentId=123, type=CAPTURED, amount=100.0, currency=USD, referenceId=null, paymentOccurredAt=2026-05-02T14:35:11.835721422Z]]
+02-05-2026 14:35:11.836 ?[35m[Test worker]?[0;39m ?[1;31mERROR?[0;39m o.l.p.t.services.LedgerServiceImpl.process - Show me the error: [oops]
+</pre>
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.2.0</a> at May 2, 2026, 2:35:12 PM</p>
+</div>
+</div>
+</body>
+</html>
