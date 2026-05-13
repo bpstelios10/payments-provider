@@ -3,7 +3,7 @@ package org.learnings.payments.paymentservice.infrastructure.outbox;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.learnings.payments.paymentservice.services.ports.EventMessage;
+import org.learnings.payments.paymentservice.application.EventMessage;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
