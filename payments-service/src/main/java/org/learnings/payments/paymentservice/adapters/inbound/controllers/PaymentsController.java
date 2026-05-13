@@ -5,8 +5,9 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.learnings.payments.paymentservice.application.CreatePaymentUseCase;
+import org.learnings.payments.paymentservice.application.ExecutePaymentUseCase;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
-import org.learnings.payments.paymentservice.application.PaymentService;
 import org.learnings.payments.paymentservice.application.dtos.PaymentDto;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
@@ -24,24 +25,26 @@ import static org.learnings.payments.paymentservice.adapters.inbound.controllers
 @RequestMapping("payments")
 public class PaymentsController {
 
-    private final PaymentService paymentService;
+    private final CreatePaymentUseCase createPaymentUseCase;
+    private final ExecutePaymentUseCase executePaymentUseCase;
 
-    public PaymentsController(PaymentService paymentService) {
-        this.paymentService = paymentService;
+    public PaymentsController(CreatePaymentUseCase createPaymentUseCase, ExecutePaymentUseCase executePaymentUseCase) {
+        this.createPaymentUseCase = createPaymentUseCase;
+        this.executePaymentUseCase = executePaymentUseCase;
     }
 
     @PostMapping
     public ResponseEntity<PaymentResponse> createPayment(@Valid @NotNull @RequestBody CreatePayment requestBody) {
         PaymentDto paymentDto = CreatePayment.toPaymentDto(requestBody);
 
-        PaymentDto responseDto = paymentService.createPayment(paymentDto);
+        PaymentDto responseDto = createPaymentUseCase.execute(paymentDto);
 
         return ResponseEntity.ok(fromPaymentDto(responseDto));
     }
 
     @PostMapping("/{paymentId}/execute")
     public ResponseEntity<PaymentResponse> executePayment(@PathVariable Long paymentId) {
-        PaymentDto responseDto = paymentService.executePayment(paymentId);
+        PaymentDto responseDto = executePaymentUseCase.execute(paymentId);
 
         return ResponseEntity.ok(fromPaymentDto(responseDto));
     }

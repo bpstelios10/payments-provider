@@ -4,8 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.learnings.payments.paymentservice.application.CreatePaymentUseCase;
+import org.learnings.payments.paymentservice.application.ExecutePaymentUseCase;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
-import org.learnings.payments.paymentservice.application.PaymentService;
 import org.learnings.payments.paymentservice.application.dtos.PaymentDto;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -25,7 +26,9 @@ import static org.mockito.Mockito.when;
 class PaymentsControllerTest {
 
     @Mock
-    private PaymentService paymentService;
+    private CreatePaymentUseCase createPaymentUseCase;
+    @Mock
+    private ExecutePaymentUseCase executePaymentUseCase;
     @InjectMocks
     private PaymentsController paymentsController;
 
@@ -36,7 +39,7 @@ class PaymentsControllerTest {
                 new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId);
         PaymentDto paymentDto = new PaymentDto(1L, BigDecimal.valueOf(10.2), "USD",
                 "merch-1", UUID.randomUUID(), PaymentStatus.INITIATED, Instant.now(), Instant.now());
-        when(paymentService.createPayment(toPaymentDto(requestBody))).thenReturn(paymentDto);
+        when(createPaymentUseCase.execute(toPaymentDto(requestBody))).thenReturn(paymentDto);
 
         ResponseEntity<PaymentsController.PaymentResponse> response = paymentsController.createPayment(requestBody);
 
@@ -54,7 +57,7 @@ class PaymentsControllerTest {
                 new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), null, "merch-1", idempotencyId);
         PaymentDto paymentDto = new PaymentDto(1L, BigDecimal.valueOf(10.2), "USD",
                 "merch-1", UUID.randomUUID(), PaymentStatus.INITIATED, Instant.now(), Instant.now());
-        when(paymentService.createPayment(toPaymentDto(requestBody))).thenReturn(paymentDto);
+        when(createPaymentUseCase.execute(toPaymentDto(requestBody))).thenReturn(paymentDto);
 
         ResponseEntity<PaymentsController.PaymentResponse> response = paymentsController.createPayment(requestBody);
 
@@ -70,7 +73,7 @@ class PaymentsControllerTest {
     void executePayment_succeeds(PaymentStatus statuses) {
         PaymentDto paymentDto = new PaymentDto(1L, BigDecimal.valueOf(10.2), "USD",
                 "merch-1", UUID.randomUUID(), statuses, Instant.now(), Instant.now());
-        when(paymentService.executePayment(paymentDto.getPaymentId())).thenReturn(paymentDto);
+        when(executePaymentUseCase.execute(paymentDto.getPaymentId())).thenReturn(paymentDto);
 
         ResponseEntity<PaymentsController.PaymentResponse> response = paymentsController.executePayment(paymentDto.getPaymentId());
 

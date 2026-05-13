@@ -11,16 +11,15 @@ import java.util.Optional;
 
 @Slf4j
 @Service
-public class LedgerServiceImpl implements LedgerService {
+public class ProcessLedgerEntryUseCase {
 
     private final LedgerEntryRepository ledgerEntryRepository;
 
-    public LedgerServiceImpl(LedgerEntryRepository ledgerEntryRepository) {
+    public ProcessLedgerEntryUseCase(LedgerEntryRepository ledgerEntryRepository) {
         this.ledgerEntryRepository = ledgerEntryRepository;
     }
 
-    @Override
-    public void process(LedgerEntryDto ledgerEntryDto) {
+    public void execute(LedgerEntryDto ledgerEntryDto) {
         log.debug("Processing ledger entry [{}]", ledgerEntryDto);
         LedgerEntry ledgerEntryEntity = LedgerEntryDto.toLedgerEntryEntity(ledgerEntryDto);
 
