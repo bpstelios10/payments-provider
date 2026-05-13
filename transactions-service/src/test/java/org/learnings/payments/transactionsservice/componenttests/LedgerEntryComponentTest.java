@@ -3,12 +3,12 @@ package org.learnings.payments.transactionsservice.componenttests;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.learnings.payments.transactionsservice.adapters.messaging.model.EventEnvelope;
-import org.learnings.payments.transactionsservice.adapters.messaging.model.EventType;
-import org.learnings.payments.transactionsservice.adapters.messaging.model.PaymentEventPayload;
+import org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.EventEnvelope;
+import org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.EventType;
+import org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.PaymentEventPayload;
 import org.learnings.payments.transactionsservice.domain.LedgerEntry;
 import org.learnings.payments.transactionsservice.domain.LedgerType;
-import org.learnings.payments.transactionsservice.repositories.LedgerEntryRepository;
+import org.learnings.payments.transactionsservice.domain.repositories.LedgerEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -48,7 +48,7 @@ import static org.awaitility.Awaitility.await;
         "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
         "spring.kafka.consumer.auto-offset-reset=earliest",
         "spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer",
-        "spring.kafka.producer.value-serializer=org.learnings.payments.transactionsservice.adapters.messaging.model.EventEnvelopeSerializer"
+        "spring.kafka.producer.value-serializer=org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.EventEnvelopeSerializer"
 })
 class LedgerEntryComponentTest {
 

@@ -1,7 +1,7 @@
 package org.learnings.payments.paymentservice.infrastructure.outbox;
 
-import org.learnings.payments.paymentservice.services.ports.EventMessage;
-import org.learnings.payments.paymentservice.services.ports.EventMessagePublisher;
+import org.learnings.payments.paymentservice.application.EventMessage;
+import org.learnings.payments.paymentservice.application.EventMessagePublisher;
 import org.springframework.stereotype.Service;
 
 @Service
