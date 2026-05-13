@@ -276,7 +276,7 @@ public class PaymentsComponentTest {
         assertThat(byPaymentId.getCreatedDate()).isNotEqualTo(byPaymentId.getUpdatedDate());
     }
 
-    public static Stream<Arguments> badRequestsProvider() {
+    private static Stream<Arguments> badRequestsProvider() {
         UUID idempotencyId = UUID.randomUUID();
         return Stream.of(
                 // validate amount

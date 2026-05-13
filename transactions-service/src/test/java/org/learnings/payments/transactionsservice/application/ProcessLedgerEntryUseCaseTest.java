@@ -21,27 +21,27 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class LedgerServiceImplTest {
+class ProcessLedgerEntryUseCaseTest {
 
     @Mock
     private LedgerEntryRepository ledgerEntryRepository;
     @InjectMocks
-    private LedgerServiceImpl ledgerService;
+    private ProcessLedgerEntryUseCase ledgerService;
 
     @Test
-    void process_whenSaveSucceeds_savesLedgerEntry() {
+    void execute_whenSaveSucceeds_savesLedgerEntry() {
         LedgerEntryDto dto = new LedgerEntryDto(UUID.randomUUID(), 123L, LedgerType.CAPTURED,
                 BigDecimal.valueOf(100.00), "USD", null, Instant.now());
         LedgerEntry entity = LedgerEntryDto.toLedgerEntryEntity(dto);
         when(ledgerEntryRepository.save(entity)).thenReturn(entity);
 
-        ledgerService.process(dto);
+        ledgerService.execute(dto);
 
         verifyNoMoreInteractions(ledgerEntryRepository);
     }
 
     @Test
-    void process_whenDataIntegrityViolationAndEntryFound_logsAndContinues() {
+    void execute_whenDataIntegrityViolationAndEntryFound_logsAndContinues() {
         LedgerEntryDto dto = new LedgerEntryDto(UUID.randomUUID(), 123L, LedgerType.CAPTURED,
                 BigDecimal.valueOf(100.00), "USD", null, Instant.now());
         LedgerEntry entity = LedgerEntryDto.toLedgerEntryEntity(dto);
@@ -50,20 +50,20 @@ class LedgerServiceImplTest {
         when(ledgerEntryRepository.save(entity)).thenThrow(DataIntegrityViolationException.class);
         when(ledgerEntryRepository.findByEventId(dto.eventId())).thenReturn(Optional.of(existing));
 
-        ledgerService.process(dto);
+        ledgerService.execute(dto);
 
         verifyNoMoreInteractions(ledgerEntryRepository);
     }
 
     @Test
-    void process_whenDataIntegrityViolationAndEntryNotFound_throwsException() {
+    void execute_whenDataIntegrityViolationAndEntryNotFound_throwsException() {
         LedgerEntryDto dto = new LedgerEntryDto(UUID.randomUUID(), 123L, LedgerType.CAPTURED,
                 BigDecimal.valueOf(100.00), "USD", null, Instant.now());
         LedgerEntry entity = LedgerEntryDto.toLedgerEntryEntity(dto);
         when(ledgerEntryRepository.save(entity)).thenThrow(new DataIntegrityViolationException("oops"));
         when(ledgerEntryRepository.findByEventId(dto.eventId())).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> ledgerService.process(dto))
+        assertThatThrownBy(() -> ledgerService.execute(dto))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("oops");
 
@@ -71,13 +71,13 @@ class LedgerServiceImplTest {
     }
 
     @Test
-    void process_whenOtherException_throwsException() {
+    void execute_whenOtherException_throwsException() {
         LedgerEntryDto dto = new LedgerEntryDto(UUID.randomUUID(), 123L, LedgerType.CAPTURED,
                 BigDecimal.valueOf(100.00), "USD", null, Instant.now());
         LedgerEntry entity = LedgerEntryDto.toLedgerEntryEntity(dto);
         when(ledgerEntryRepository.save(entity)).thenThrow(new RuntimeException("oops"));
 
-        assertThatThrownBy(() -> ledgerService.process(dto))
+        assertThatThrownBy(() -> ledgerService.execute(dto))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessageContaining("oops");
 

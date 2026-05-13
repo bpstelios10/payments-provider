@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.EventEnvelope;
 import org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.PaymentEventPayload;
-import org.learnings.payments.transactionsservice.application.LedgerService;
+import org.learnings.payments.transactionsservice.application.ProcessLedgerEntryUseCase;
 import org.learnings.payments.transactionsservice.application.dtos.LedgerEntryDto;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 class PaymentCapturedEventConsumerTest {
 
     @Mock
-    private LedgerService ledgerService;
+    private ProcessLedgerEntryUseCase processLedgerEntryUseCase;
     @InjectMocks
     private PaymentCapturedEventConsumer consumer;
 
@@ -36,11 +36,11 @@ class PaymentCapturedEventConsumerTest {
                 new EventEnvelope<>(UUID.randomUUID(), PAYMENT_CAPTURED, payload, paymentOccurredAt.plusSeconds(1));
         PaymentCapturedEvent paymentCapturedEvent = PaymentCapturedEvent.fromEventEnvelope(envelope);
         LedgerEntryDto ledgerEntryDto = PaymentCapturedEvent.toLedgerEntryDto(paymentCapturedEvent);
-        doNothing().when(ledgerService).process(ledgerEntryDto);
+        doNothing().when(processLedgerEntryUseCase).execute(ledgerEntryDto);
 
         consumer.consume(envelope);
 
-        verifyNoMoreInteractions(ledgerService);
+        verifyNoMoreInteractions(processLedgerEntryUseCase);
     }
 
     @Test
@@ -49,7 +49,7 @@ class PaymentCapturedEventConsumerTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("not a payment captured event");
 
-        verifyNoMoreInteractions(ledgerService);
+        verifyNoMoreInteractions(processLedgerEntryUseCase);
     }
 
     @Test
@@ -61,6 +61,6 @@ class PaymentCapturedEventConsumerTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("not a payment captured event");
 
-        verifyNoMoreInteractions(ledgerService);
+        verifyNoMoreInteractions(processLedgerEntryUseCase);
     }
 }

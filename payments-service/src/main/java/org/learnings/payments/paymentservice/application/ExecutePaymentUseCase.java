@@ -2,82 +2,45 @@ package org.learnings.payments.paymentservice.application;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.learnings.payments.paymentservice.application.dtos.PaymentDto;
 import org.learnings.payments.paymentservice.domain.Payment;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.learnings.payments.paymentservice.domain.PaymentStatusAction;
 import org.learnings.payments.paymentservice.domain.repositories.PaymentRepository;
 import org.learnings.payments.paymentservice.domain.statustransitions.PaymentActionResolver;
-import org.learnings.payments.paymentservice.application.dtos.PaymentDto;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.server.ResponseStatusException;
-import tools.jackson.databind.json.JsonMapper;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
-import static org.learnings.payments.paymentservice.domain.PaymentStatus.INITIATED;
 import static org.learnings.payments.paymentservice.domain.PaymentStatus.PROCESSING;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Slf4j
 @Service
-public class PaymentServiceImpl implements PaymentService {
+public class ExecutePaymentUseCase {
 
     @Value("${service.processing-status-timeout-seconds:10}")
     private int PROCESSING_STATUS_TIMEOUT_DURATION_SECS;
     private final PaymentRepository paymentRepository;
-    private final EventMessagePublisher eventMessagePublisher;
-    private final JsonMapper jsonMapper;
     private final PaymentActionResolver paymentActionResolver;
     private final PaymentGateway paymentGateway;
-    private final TransactionTemplate transactionTemplate;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, EventMessagePublisher eventMessagePublisher,
-                              JsonMapper jsonMapper, PaymentActionResolver paymentActionResolver,
-                              PaymentGateway paymentGateway, TransactionTemplate transactionTemplate) {
+    public ExecutePaymentUseCase(PaymentRepository paymentRepository, PaymentActionResolver paymentActionResolver,
+                                 PaymentGateway paymentGateway) {
         this.paymentRepository = paymentRepository;
-        this.eventMessagePublisher = eventMessagePublisher;
-        this.jsonMapper = jsonMapper;
         this.paymentActionResolver = paymentActionResolver;
         this.paymentGateway = paymentGateway;
-        this.transactionTemplate = transactionTemplate;
-    }
-
-    /*
-     * we cant mark this method as Transactional cause in case of failure, the transaction is marked for rollback. but
-     * then in the catch block, we need to do another payment request, but the transaction is now dirty. issues!
-     * we resolve by using saveAndAudit for atomicity. we use TransactionTemplate in there, to keep the transaction
-     * scope narrower, inside the saveAndAudit method only. (cant mark saveAndAudit as Transactional cause it is private
-     * and internal method). Now, the catch block is safe. We use the repo, so another independent transaction, in there
-     */
-    @Override
-    public PaymentDto createPayment(PaymentDto paymentDto) {
-        Payment payment = PaymentDto.toPayment(paymentDto, INITIATED);
-        Payment savedPayment;
-
-        try {
-            savedPayment = saveAndAudit(payment, INITIATED);
-            log.debug("payment with id [{}] created at [{}]", savedPayment.getPaymentId(), savedPayment.getCreatedDate());
-        } catch (DataIntegrityViolationException dae) {
-            log.debug("payment creation failed with error: [{}]", dae.getMessage());
-            Optional<Payment> byIdempotencyKey = paymentRepository.findByIdempotencyKey(paymentDto.getIdempotencyKey());
-
-            return PaymentDto.fromPayment(byIdempotencyKey.orElseThrow(() -> dae));
-        }
-
-        return PaymentDto.fromPayment(savedPayment);
     }
 
     // This method is not annotated as transactional cause the rest call will keep it open for a long time
     // so we make it atomic by using Status and no need to rollback in any case of failure.
     // this is achieved with the PROCESSING status with a timestamp and using idempotency-key on the downstream call.
-    @Override
-    public PaymentDto executePayment(long paymentId) {
+    public PaymentDto execute(long paymentId) {
         PaymentDto paymentDto = getPaymentDtoById(paymentId);
 
         // return fast, if it is not in valid state for processing
@@ -110,19 +73,6 @@ public class PaymentServiceImpl implements PaymentService {
         Payment updated = paymentRepository.findById(paymentId).orElseThrow();
 
         return PaymentDto.fromPayment(updated);
-    }
-
-    @SuppressWarnings("SameParameterValue")
-    private Payment saveAndAudit(Payment payment, PaymentStatus paymentStatus) {
-        return transactionTemplate.execute(_ -> {
-            Payment saved = paymentRepository.save(payment);
-
-            EventMessage event = new EventMessage(saved.getPaymentId(), "PAYMENT", paymentStatus.name(),
-                    jsonMapper.writeValueAsString(saved));
-            eventMessagePublisher.publish(event);
-
-            return saved;
-        });
     }
 
     private @NonNull PaymentDto getPaymentDtoById(long paymentId) {

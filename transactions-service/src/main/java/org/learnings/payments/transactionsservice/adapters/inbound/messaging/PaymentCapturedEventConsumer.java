@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.EventEnvelope;
 import org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.EventType;
 import org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.PaymentEventPayload;
-import org.learnings.payments.transactionsservice.application.LedgerService;
+import org.learnings.payments.transactionsservice.application.ProcessLedgerEntryUseCase;
 import org.learnings.payments.transactionsservice.application.dtos.LedgerEntryDto;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Controller;
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class PaymentCapturedEventConsumer {
 
-    private final LedgerService ledgerService;
+    private final ProcessLedgerEntryUseCase processLedgerEntryUseCase;
 
-    public PaymentCapturedEventConsumer(LedgerService ledgerService) {
-        this.ledgerService = ledgerService;
+    public PaymentCapturedEventConsumer(ProcessLedgerEntryUseCase processLedgerEntryUseCase) {
+        this.processLedgerEntryUseCase = processLedgerEntryUseCase;
     }
 
     @KafkaListener(topics = "PAYMENT_CAPTURED")
@@ -29,6 +29,6 @@ public class PaymentCapturedEventConsumer {
         PaymentCapturedEvent paymentCapturedEvent = PaymentCapturedEvent.fromEventEnvelope(envelope);
         LedgerEntryDto ledgerEntryDto = PaymentCapturedEvent.toLedgerEntryDto(paymentCapturedEvent);
 
-        ledgerService.process(ledgerEntryDto);
+        processLedgerEntryUseCase.execute(ledgerEntryDto);
     }
 }
