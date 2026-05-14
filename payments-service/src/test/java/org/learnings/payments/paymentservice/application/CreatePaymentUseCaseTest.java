@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.learnings.payments.paymentservice.application.dtos.PaymentDto;
 import org.learnings.payments.paymentservice.domain.Payment;
-import org.learnings.payments.paymentservice.domain.PaymentStatus;
 import org.learnings.payments.paymentservice.domain.repositories.PaymentRepository;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -14,7 +13,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-import tools.jackson.databind.json.JsonMapper;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -38,8 +36,6 @@ class CreatePaymentUseCaseTest {
     @Mock
     private EventMessagePublisher eventMessagePublisher;
     @Mock
-    private JsonMapper jsonMapper;
-    @Mock
     private TransactionTemplate transactionTemplate;
     @InjectMocks
     private CreatePaymentUseCase createPaymentUseCase;
@@ -52,10 +48,8 @@ class CreatePaymentUseCaseTest {
         Payment savedPayment = getMockedPayment(1L, idempotencyKey, INITIATED);
         when(savedPayment.getCreatedDate()).thenReturn(Instant.now());
         when(paymentRepository.save(payment)).thenReturn(savedPayment);
-        when(jsonMapper.writeValueAsString(savedPayment)).thenReturn(payment.toString());
         mockTransactionTemplateToExecuteCallback();
-        when(jsonMapper.writeValueAsString(savedPayment)).thenReturn("saved-payment");
-        EventMessage event = new EventMessage(1L, "PAYMENT", INITIATED.name(), "saved-payment");
+        EventMessage event = new EventMessage(1L, "PAYMENT", INITIATED.name(), savedPayment);
         doNothing().when(eventMessagePublisher).publish(event);
 
         PaymentDto createdPaymentDto = createPaymentUseCase.execute(dto);
@@ -108,10 +102,8 @@ class CreatePaymentUseCaseTest {
         Payment payment = PaymentDto.toPayment(dto, INITIATED);
         Payment savedPayment = getMockedPayment(1L);
         when(paymentRepository.save(payment)).thenReturn(savedPayment);
-        when(jsonMapper.writeValueAsString(savedPayment)).thenReturn(payment.toString());
         mockTransactionTemplateToExecuteCallback();
-        when(jsonMapper.writeValueAsString(savedPayment)).thenReturn("saved-payment");
-        EventMessage event = new EventMessage(1L, "PAYMENT", INITIATED.name(), "saved-payment");
+        EventMessage event = new EventMessage(1L, "PAYMENT", INITIATED.name(), savedPayment);
         doThrow(new CannotGetJdbcConnectionException("oops")).when(eventMessagePublisher).publish(event);
 
         assertThatThrownBy(() -> createPaymentUseCase.execute(dto))
@@ -122,7 +114,7 @@ class CreatePaymentUseCaseTest {
 
     private void verifyNoMoreMockInteractions(Object... extraMocks) {
         Object[] mocks = Stream.concat(
-                Stream.of(paymentRepository, eventMessagePublisher, jsonMapper, transactionTemplate),
+                Stream.of(paymentRepository, eventMessagePublisher, transactionTemplate),
                 extraMocks == null ? Stream.empty() : Stream.of(extraMocks)
         ).toArray();
 

@@ -45,7 +45,7 @@ public class OutboxEvent {
     @Setter
     private String lastError;
 
-    static OutboxEvent fromEventMessage(EventMessage event) {
-        return new OutboxEvent(event.aggregateId(), event.aggregateType(), event.eventType(), event.payload());
+    static OutboxEvent fromEventMessage(EventMessage event, String payload) {
+        return new OutboxEvent(event.aggregateId(), event.aggregateType(), event.eventType(), payload);
     }
 }
