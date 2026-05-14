@@ -5,9 +5,13 @@ plugins {
 
 ext {
     versions = [
+            // the versions should match whatever our spring version is using
+            junitJupiter: '6.0.3',
+            mockitoJunitJupiter: '5.23.0',
+            assertj: '3.27.7'
     ]
 
-    javaProjects = ['payments-service', 'transactions-service']
+    javaProjects = ['payments-service', 'transactions-service', 'messaging-outbox-core']
     springWebProjects = ['payments-service', 'transactions-service']
 }
 
@@ -29,6 +33,15 @@ subprojects { subproj ->
             targetCompatibility = JavaVersion.VERSION_25
         }
 
+        dependencies {
+            testImplementation("org.junit.jupiter:junit-jupiter-api:${versions.junitJupiter}")
+            testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${versions.junitJupiter}")
+            testRuntimeOnly("org.junit.platform:junit-platform-launcher:${versions.junitJupiter}")
+            testImplementation("org.mockito:mockito-junit-jupiter:${versions.mockitoJunitJupiter}")
+            testImplementation("org.assertj:assertj-core:${versions.assertj}")
+            test.useJUnitPlatform()
+        }
+
         apply from: '../gradle/jacoco.gradle'
     }
 
@@ -48,7 +61,6 @@ subprojects { subproj ->
             annotationProcessor 'org.projectlombok:lombok:1.18.44'
 
             testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-            test.useJUnitPlatform()
         }
 
         jar.enabled=false
