@@ -8,7 +8,6 @@ import org.learnings.payments.paymentservice.domain.repositories.PaymentReposito
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionTemplate;
-import tools.jackson.databind.json.JsonMapper;
 
 import java.util.Optional;
 
@@ -20,14 +19,12 @@ public class CreatePaymentUseCase {
 
     private final PaymentRepository paymentRepository;
     private final EventMessagePublisher eventMessagePublisher;
-    private final JsonMapper jsonMapper;
     private final TransactionTemplate transactionTemplate;
 
     public CreatePaymentUseCase(PaymentRepository paymentRepository, EventMessagePublisher eventMessagePublisher,
-                                JsonMapper jsonMapper, TransactionTemplate transactionTemplate) {
+                                TransactionTemplate transactionTemplate) {
         this.paymentRepository = paymentRepository;
         this.eventMessagePublisher = eventMessagePublisher;
-        this.jsonMapper = jsonMapper;
         this.transactionTemplate = transactionTemplate;
     }
 
@@ -60,8 +57,7 @@ public class CreatePaymentUseCase {
         return transactionTemplate.execute(_ -> {
             Payment saved = paymentRepository.save(payment);
 
-            EventMessage event = new EventMessage(saved.getPaymentId(), "PAYMENT", paymentStatus.name(),
-                    jsonMapper.writeValueAsString(saved));
+            EventMessage event = new EventMessage(saved.getPaymentId(), "PAYMENT", paymentStatus.name(), saved);
             eventMessagePublisher.publish(event);
 
             return saved;
