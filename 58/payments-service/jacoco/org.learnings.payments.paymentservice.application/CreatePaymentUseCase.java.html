@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreatePaymentUseCase.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">payments-service</a> &gt; <a href="index.source.html" class="el_package">org.learnings.payments.paymentservice.application</a> &gt; <span class="el_source">CreatePaymentUseCase.java</span></div><h1>CreatePaymentUseCase.java</h1><pre class="source lang-java linenums">package org.learnings.payments.paymentservice.application;
+
+import lombok.extern.slf4j.Slf4j;
+import org.learnings.payments.paymentservice.application.dtos.PaymentDto;
+import org.learnings.payments.paymentservice.domain.Payment;
+import org.learnings.payments.paymentservice.domain.PaymentStatus;
+import org.learnings.payments.paymentservice.domain.repositories.PaymentRepository;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import java.util.Optional;
+
+import static org.learnings.payments.paymentservice.domain.PaymentStatus.INITIATED;
+
+<span class="fc" id="L16">@Slf4j</span>
+@Service
+public class CreatePaymentUseCase {
+
+    private final PaymentRepository paymentRepository;
+    private final EventMessagePublisher eventMessagePublisher;
+    private final TransactionTemplate transactionTemplate;
+
+    public CreatePaymentUseCase(PaymentRepository paymentRepository, EventMessagePublisher eventMessagePublisher,
+<span class="fc" id="L25">                                TransactionTemplate transactionTemplate) {</span>
+<span class="fc" id="L26">        this.paymentRepository = paymentRepository;</span>
+<span class="fc" id="L27">        this.eventMessagePublisher = eventMessagePublisher;</span>
+<span class="fc" id="L28">        this.transactionTemplate = transactionTemplate;</span>
+<span class="fc" id="L29">    }</span>
+
+    /*
+     * we cant mark this method as Transactional cause in case of failure, the transaction is marked for rollback. but
+     * then in the catch block, we need to do another payment request, but the transaction is now dirty. issues!
+     * we resolve by using saveAndAudit for atomicity. we use TransactionTemplate in there, to keep the transaction
+     * scope narrower, inside the saveAndAudit method only. (cant mark saveAndAudit as Transactional cause it is private
+     * and internal method). Now, the catch block is safe. We use the repo, so another independent transaction, in there
+     */
+    public PaymentDto execute(PaymentDto paymentDto) {
+<span class="fc" id="L39">        Payment payment = PaymentDto.toPayment(paymentDto, INITIATED);</span>
+        Payment savedPayment;
+
+        try {
+<span class="fc" id="L43">            savedPayment = saveAndAudit(payment, INITIATED);</span>
+<span class="fc" id="L44">            log.debug(&quot;payment with id [{}] created at [{}]&quot;, savedPayment.getPaymentId(), savedPayment.getCreatedDate());</span>
+<span class="fc" id="L45">        } catch (DataIntegrityViolationException dae) {</span>
+<span class="fc" id="L46">            log.debug(&quot;payment creation failed with error: [{}]&quot;, dae.getMessage());</span>
+<span class="fc" id="L47">            Optional&lt;Payment&gt; byIdempotencyKey = paymentRepository.findByIdempotencyKey(paymentDto.getIdempotencyKey());</span>
+
+<span class="fc" id="L49">            return PaymentDto.fromPayment(byIdempotencyKey.orElseThrow(() -&gt; dae));</span>
+<span class="fc" id="L50">        }</span>
+
+<span class="fc" id="L52">        return PaymentDto.fromPayment(savedPayment);</span>
+    }
+
+    @SuppressWarnings(&quot;SameParameterValue&quot;)
+    private Payment saveAndAudit(Payment payment, PaymentStatus paymentStatus) {
+<span class="fc" id="L57">        return transactionTemplate.execute(_ -&gt; {</span>
+<span class="fc" id="L58">            Payment saved = paymentRepository.save(payment);</span>
+
+<span class="fc" id="L60">            EventMessage event = new EventMessage(saved.getPaymentId(), &quot;PAYMENT&quot;, paymentStatus.name(), saved);</span>
+<span class="fc" id="L61">            eventMessagePublisher.publish(event);</span>
+
+<span class="fc" id="L63">            return saved;</span>
+        });
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
