@@ -2,4 +2,5 @@ rootProject.name = 'payments-provider'
 
 include 'transactions-service',
         'payments-service',
-        'messaging-outbox-core'
+        'messaging-outbox-core',
+        'messaging-outbox-spring-jpa'

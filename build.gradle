@@ -11,7 +11,7 @@ ext {
             assertj: '3.27.7'
     ]
 
-    javaProjects = ['payments-service', 'transactions-service', 'messaging-outbox-core']
+    javaProjects = ['payments-service', 'transactions-service', 'messaging-outbox-core', 'messaging-outbox-spring-jpa']
     springWebProjects = ['payments-service', 'transactions-service']
 }
 
