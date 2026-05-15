@@ -1,6 +1,7 @@
 package org.learnings.payments.messaging.outbox.jpa;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
  * of its configuration classes for this scheduler to activate.
  */
 @Component
+@EnableScheduling
 @ConditionalOnProperty(name = "outbox.spring.scheduling.enabled", havingValue = "true")
 public class OutboxScheduler {
 

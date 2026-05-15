@@ -2,9 +2,9 @@ package org.learnings.payments.paymentservice.componenttests;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.learnings.payments.messaging.outbox.jpa.OutboxEvent;
+import org.learnings.payments.messaging.outbox.jpa.OutboxEventRepository;
 import org.learnings.payments.paymentservice.domain.Payment;
-import org.learnings.payments.paymentservice.infrastructure.outbox.OutboxEvent;
-import org.learnings.payments.paymentservice.infrastructure.outbox.OutboxRepository;
 import org.learnings.payments.paymentservice.application.PaymentGateway;
 import org.learnings.payments.paymentservice.adapters.inbound.controllers.PaymentsController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,14 +40,14 @@ public class PaymentsWithMockedOutboxRepositoryComponentTest {
     @Autowired
     private TestPaymentRepository repository;
     @MockitoBean
-    private OutboxRepository outboxRepository;
+    private OutboxEventRepository outboxEventRepository;
     @MockitoBean
     private PaymentGateway paymentGateway;
 
     @BeforeEach
     void setup() {
         doThrow(new CannotGetJdbcConnectionException("oops"))
-                .when(outboxRepository).save(any(OutboxEvent.class));
+                .when(outboxEventRepository).save(any(OutboxEvent.class));
     }
 
     @Test

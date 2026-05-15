@@ -1,8 +1,7 @@
 package org.learnings.payments.messaging.outbox.jpa;
 
-import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
 import java.util.List;
@@ -26,6 +25,13 @@ public interface OutboxEventRepository extends JpaRepository<OutboxEvent, UUID> 
      * @param now the current timestamp used to filter events whose {@code nextRetryAt} has passed
      * @return a list of locked events ready to be sent; never {@code null}
      */
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query(value = """
+            SELECT * FROM outbox_event
+            WHERE published = false
+              AND failed = false
+              AND next_retry_at <= :now
+            ORDER BY created_at
+            LIMIT 100
+            FOR UPDATE SKIP LOCKED""", nativeQuery = true)
     List<OutboxEvent> findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc(Instant now);
 }
