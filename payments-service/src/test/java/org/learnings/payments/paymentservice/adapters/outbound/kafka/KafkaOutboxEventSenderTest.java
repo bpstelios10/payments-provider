@@ -1,7 +1,7 @@
 package org.learnings.payments.paymentservice.adapters.outbound.kafka;
 
 import org.junit.jupiter.api.Test;
-import org.learnings.payments.paymentservice.infrastructure.outbox.OutboxEvent;
+import org.learnings.payments.messaging.outbox.OutboxRecord;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
@@ -11,7 +11,7 @@ class KafkaOutboxEventSenderTest {
 
     @Test
     void send_succeeds() {
-        OutboxEvent event = new OutboxEvent(1L, "", "", "");
+        OutboxRecord event = new OutboxRecord(1L, "", "", "");
 
         assertDoesNotThrow(() -> kafkaOutboxEventSender.send(event));
     }

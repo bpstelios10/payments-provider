@@ -1,5 +1,6 @@
 package org.learnings.payments.messaging.outbox.jpa;
 
+import org.learnings.payments.messaging.outbox.OutboxEventSender;
 import org.learnings.payments.messaging.outbox.OutboxProcessor;
 import org.learnings.payments.messaging.outbox.OutboxRecord;
 import org.springframework.stereotype.Service;
@@ -37,11 +38,11 @@ public class OutboxEventProcessorRunner {
      * Creates a new runner.
      *
      * @param repository the JPA repository for loading and persisting outbox events
-     * @param processor  the core processor that handles retry logic and sends records
+     * @param sender  is used to create the core processor that handles retry logic and sends records
      */
-    public OutboxEventProcessorRunner(OutboxEventRepository repository, OutboxProcessor processor) {
+    public OutboxEventProcessorRunner(OutboxEventRepository repository, OutboxEventSender sender) {
         this.repository = repository;
-        this.processor = processor;
+        this.processor = new OutboxProcessor(sender);
     }
 
     /**
