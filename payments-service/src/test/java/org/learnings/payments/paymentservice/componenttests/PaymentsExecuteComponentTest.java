@@ -1,19 +1,17 @@
 package org.learnings.payments.paymentservice.componenttests;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.NullSource;
+import org.learnings.payments.messaging.outbox.jpa.OutboxEventRepository;
+import org.learnings.payments.paymentservice.adapters.inbound.controllers.PaymentsController;
+import org.learnings.payments.paymentservice.application.PaymentGateway;
 import org.learnings.payments.paymentservice.domain.Payment;
 import org.learnings.payments.paymentservice.domain.PaymentStatus;
-import org.learnings.payments.paymentservice.application.PaymentGateway;
-import org.learnings.payments.paymentservice.adapters.inbound.controllers.PaymentsController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,9 +24,13 @@ import java.time.Duration;
 import java.util.List;
 import java.util.ServiceConfigurationError;
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import static java.lang.Thread.sleep;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -42,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @ActiveProfiles("component-test")
 @AutoConfigureMockMvc
-public class PaymentsComponentTest {
+public class PaymentsExecuteComponentTest extends PaymentsComponentTestBase {
 
     @Autowired
     private MockMvc mockMvc;
@@ -50,63 +52,15 @@ public class PaymentsComponentTest {
     private JsonMapper jsonMapper;
     @Autowired
     private TestPaymentRepository repository;
+    @Autowired
+    private OutboxEventRepository outboxEventRepository;
     @MockitoBean
     private PaymentGateway paymentGateway;
 
-    @Test
-    void createPayment_succeeds() throws Exception {
-        UUID idempotencyId = UUID.randomUUID();
-        PaymentsController.CreatePayment requestBody =
-                new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId);
-
-        MvcResult mvcResult = mockMvc.perform(
-                        post("/payments")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonMapper.writeValueAsString(requestBody)))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        assertThat(mvcResult).isNotNull();
-        assertThat(mvcResult.getResponse()).isNotNull();
-        String contentAsString = mvcResult.getResponse().getContentAsString();
-        PaymentsController.PaymentResponse paymentResponseDto =
-                jsonMapper.readValue(contentAsString, PaymentsController.PaymentResponse.class);
-        assertThat(paymentResponseDto).isNotNull();
-        assertThat(paymentResponseDto.status()).isEqualTo(PaymentStatus.INITIATED);
-
-        Payment byPaymentId = repository.findByPaymentId(paymentResponseDto.paymentId());
-        assertThat("merch-1").isEqualTo(byPaymentId.getMerchantId());
-    }
-
-    @Test
-    void createPayment_whenSameIdempotencyKey_avoidsRetryByReturningExistingPayment() throws Exception {
-        UUID idempotencyId = UUID.randomUUID();
-        PaymentsController.CreatePayment requestBody =
-                new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId);
-
-        mockMvc.perform(
-                        post("/payments")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonMapper.writeValueAsString(requestBody)))
-                .andExpect(status().isOk());
-
-
-        mockMvc.perform(
-                        post("/payments")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonMapper.writeValueAsString(requestBody)))
-                .andExpect(status().isOk());
-    }
-
-    @ParameterizedTest
-    @MethodSource("badRequestsProvider")
-    @NullSource
-    void createPayment_whenInvalidInput_throwsBadRequest(PaymentsController.CreatePayment request) throws Exception {
-        mockMvc.perform(
-                        post("/payments")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(jsonMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
+    @BeforeEach
+    void cleanUp() {
+        outboxEventRepository.deleteAll();
+        repository.deleteAll();
     }
 
     @Test
@@ -131,6 +85,9 @@ public class PaymentsComponentTest {
         assertThat("merch-1").isEqualTo(byPaymentId.getMerchantId());
         assertThat(PaymentStatus.CAPTURED).isEqualTo(byPaymentId.getStatus());
         assertThat(byPaymentId.getCreatedDate()).isNotEqualTo(byPaymentId.getUpdatedDate());
+
+        assertThatPaymentsAndOutboxTablesHaveNewRecords(1);
+        assertThatOutboxEventIsCreated(byPaymentId);
     }
 
     @Test
@@ -157,12 +114,17 @@ public class PaymentsComponentTest {
         assertThat("merch-1").isEqualTo(byPaymentId.getMerchantId());
         assertThat(PaymentStatus.FAILED).isEqualTo(byPaymentId.getStatus());
         assertThat(byPaymentId.getCreatedDate()).isNotEqualTo(byPaymentId.getUpdatedDate());
+
+        assertThatPaymentsAndOutboxTablesHaveNewRecords(1);
+        assertThatOutboxEventIsCreated(byPaymentId);
     }
 
     @Test
     void executePayment_whenNotExistedPayment_throwsNotFound() throws Exception {
         mockMvc.perform(post("/payments/{paymentId}/execute", 185723482357L))
                 .andExpect(status().isNotFound());
+
+        assertThatPaymentsAndOutboxTablesHaveNewRecords(0);
     }
 
     @ParameterizedTest
@@ -170,6 +132,8 @@ public class PaymentsComponentTest {
     void executePayment_whenInvalidInput_throwsBadRequest(String paymentId, int errorStatusCode) throws Exception {
         mockMvc.perform(post("/payments/{paymentId}/execute", paymentId))
                 .andExpect(status().is(errorStatusCode));
+
+        assertThatPaymentsAndOutboxTablesHaveNewRecords(0);
     }
 
     /*
@@ -230,6 +194,9 @@ public class PaymentsComponentTest {
         assertThat(PaymentStatus.CAPTURED).isEqualTo(capturedPayment.getStatus());
         assertThat(capturedPayment.getCreatedDate()).isBefore(capturedPayment.getProcessingStartedAt());
         assertThat(capturedPayment.getProcessingStartedAt()).isBefore(capturedPayment.getUpdatedDate());
+
+        assertThatPaymentsAndOutboxTablesHaveNewRecords(1);
+        assertThatOutboxEventIsCreated(capturedPayment);
     }
 
     @Test
@@ -274,21 +241,9 @@ public class PaymentsComponentTest {
         assertThat("merch-1").isEqualTo(byPaymentId.getMerchantId());
         assertThat(PaymentStatus.INITIATED).isNotEqualTo(byPaymentId.getStatus());
         assertThat(byPaymentId.getCreatedDate()).isNotEqualTo(byPaymentId.getUpdatedDate());
-    }
 
-    private static Stream<Arguments> badRequestsProvider() {
-        UUID idempotencyId = UUID.randomUUID();
-        return Stream.of(
-                // validate amount
-                Arguments.of(new PaymentsController.CreatePayment(null, "USD", "merch-1", idempotencyId)),
-                Arguments.of(new PaymentsController.CreatePayment(BigDecimal.valueOf(-10.2), "USD", "merch-1", idempotencyId)),
-                Arguments.of(new PaymentsController.CreatePayment(BigDecimal.valueOf(1.222), "USD", "merch-1", idempotencyId)),
-                // validate merchant-id
-                Arguments.of(new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), null, null, idempotencyId)),
-                Arguments.of(new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), null, "", idempotencyId)),
-                // validate idempotency-id
-                Arguments.of(new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), null, "merch-1", null))
-        );
+        assertThatPaymentsAndOutboxTablesHaveNewRecords(1);
+        assertThatOutboxEventIsCreated(byPaymentId);
     }
 
     private Supplier<MvcResult> performExecute(long paymentId, CountDownLatch lockedOutThread) {

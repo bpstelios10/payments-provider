@@ -29,9 +29,9 @@ public class OutboxEvent {
     @Id
     @GeneratedValue
     private UUID id;
-    private Long aggregateId;
-    private String aggregateType;
-    private String eventType;
+    private Long aggregateId; // paymentId
+    private String aggregateType; // PAYMENT
+    private String eventType; // status
     @Column(columnDefinition = "TEXT")
     private String payload;
     @SuppressWarnings("UnusedDeclaration")
