@@ -43,9 +43,11 @@ import static org.awaitility.Awaitility.await;
                 // try to reduce the memory needed by embedded-kafka
                 "log.segment.bytes=1048576",
                 "log.segment.bytes=1048576", // 1MB instead of 1GB
-                "log.retention.bytes=1048576",
+                "log.retention.bytes=1",
+                "log.retention.ms=1",        // Kafka cleans up more aggressively during the test run
                 "num.network.threads=2",     // Reduce thread overhead
-                "num.io.threads=2"})
+                "num.io.threads=2",
+                "delete.topic.enable=true"})
 @TestPropertySource(properties = {
         "kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
         "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",

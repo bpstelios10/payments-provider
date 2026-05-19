@@ -27,7 +27,7 @@ server:
 
 spring:
   datasource:
-    url: 'jdbc:h2:mem:payments'
+    url: 'jdbc:h2:mem:payments;DB_CLOSE_DELAY=-1;TIME ZONE=UTC'
     driverClassName: 'org.h2.Driver'
     username: ${DB_USERNAME:dbuser}
     password: ${DB_PASSWORD:dbpass}
