@@ -71,4 +71,26 @@ public class PaymentsWithMockedOutboxRepositoryComponentTest {
         List<Payment> allPayments = repository.findAll();
         assertThat(allPayments).hasSize(0);
     }
+
+    @Test
+    void executePayment_whenFailsToPublishEvent_leavesPaymentStatusToProcessing() throws Exception {
+        UUID idempotencyId = UUID.randomUUID();
+        PaymentsController.CreatePayment requestBody =
+                new PaymentsController.CreatePayment(BigDecimal.valueOf(10.2), "USD", "merch-1", idempotencyId);
+
+        MvcResult mvcResult = mockMvc.perform(
+                        post("/payments")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(jsonMapper.writeValueAsString(requestBody)))
+                .andExpect(status().isInternalServerError())
+                .andReturn();
+
+        assertThat(mvcResult).isNotNull();
+        assertThat(mvcResult.getResponse()).isNotNull();
+        String contentAsString = mvcResult.getResponse().getContentAsString();
+        assertThat(contentAsString).isEmpty();
+
+        List<Payment> allPayments = repository.findAll();
+        assertThat(allPayments).hasSize(0);
+    }
 }

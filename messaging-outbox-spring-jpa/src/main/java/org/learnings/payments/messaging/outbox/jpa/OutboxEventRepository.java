@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -34,4 +35,6 @@ public interface OutboxEventRepository extends JpaRepository<OutboxEvent, UUID> 
             LIMIT 100
             FOR UPDATE SKIP LOCKED""", nativeQuery = true)
     List<OutboxEvent> findAndLockTop100ByPublishedFalseAndFailedFalseAndNextRetryAtBeforeOrderByCreatedAtAsc(Instant now);
+
+    Optional<OutboxEvent> findByAggregateIdAndAggregateTypeAndEventType(Long aggregateId, String aggregateType, String eventType);
 }
