@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
@@ -33,9 +35,13 @@ class ExecutePaymentUseCaseTest {
     @Mock
     private PaymentRepository paymentRepository;
     @Mock
+    private PaymentActionResolver paymentActionResolver;
+    @Mock
     private PaymentGateway paymentGateway;
     @Mock
-    private PaymentActionResolver paymentActionResolver;
+    private TransactionTemplate transactionTemplate;
+    @Mock
+    private EventMessagePublisher eventMessagePublisher;
     @InjectMocks
     private ExecutePaymentUseCase executePaymentUseCase;
 
@@ -52,6 +58,7 @@ class ExecutePaymentUseCaseTest {
         when(paymentRepository.findById(paymentId)).thenReturn(Optional.of(mockedPayment));
         when(paymentRepository.claimProcessingStatus(eq(paymentId), any(), any())).thenReturn(1);
         when(paymentRepository.setStatusIfCurrentStatusIs(paymentId, CAPTURED, PROCESSING)).thenReturn(1);
+        mockTransactionTemplateToExecuteCallback();
 
         PaymentDto responsePaymentDto = executePaymentUseCase.execute(paymentId);
 
@@ -59,6 +66,7 @@ class ExecutePaymentUseCaseTest {
         assertThat(1L).isEqualTo(responsePaymentDto.getPaymentId());
         assertThat(PaymentStatus.CAPTURED).isEqualTo(responsePaymentDto.getStatus());
         verify(paymentGateway).executePayment(any(PaymentDto.class), eq(idempotencyKey));
+        verify(eventMessagePublisher).publish(any());
         verifyNoMoreMockInteractions();
     }
 
@@ -126,18 +134,29 @@ class ExecutePaymentUseCaseTest {
         when(paymentRepository.setStatusIfCurrentStatusIs(paymentId, FAILED, PROCESSING)).thenReturn(1);
         doThrow(new RuntimeException("something went wrong"))
                 .when(paymentGateway).executePayment(any(PaymentDto.class), eq(idempotencyKey));
+        mockTransactionTemplateToExecuteCallback();
 
         PaymentDto responsePaymentDto = executePaymentUseCase.execute(paymentId);
 
         assertThat(responsePaymentDto).isNotNull();
         assertThat(1L).isEqualTo(responsePaymentDto.getPaymentId());
         assertThat(PaymentStatus.FAILED).isEqualTo(responsePaymentDto.getStatus());
+        verify(eventMessagePublisher).publish(any());
         verifyNoMoreMockInteractions();
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    void mockTransactionTemplateToExecuteCallback() {
+        doAnswer(invocation -> {
+            TransactionCallback<?> callback = invocation.getArgument(0);
+
+            return callback.doInTransaction(null); // simulate  behavior
+        }).when(transactionTemplate).execute(any());
     }
 
     private void verifyNoMoreMockInteractions(Object... extraMocks) {
         Object[] mocks = Stream.concat(
-                Stream.of(paymentRepository, paymentActionResolver, paymentGateway),
+                Stream.of(paymentRepository, paymentActionResolver, paymentGateway, transactionTemplate, eventMessagePublisher),
                 extraMocks == null ? Stream.empty() : Stream.of(extraMocks)
         ).toArray();
 

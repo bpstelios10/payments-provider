@@ -34,9 +34,9 @@ class CreatePaymentUseCaseTest {
     @Mock
     private PaymentRepository paymentRepository;
     @Mock
-    private EventMessagePublisher eventMessagePublisher;
-    @Mock
     private TransactionTemplate transactionTemplate;
+    @Mock
+    private EventMessagePublisher eventMessagePublisher;
     @InjectMocks
     private CreatePaymentUseCase createPaymentUseCase;
 

@@ -18,14 +18,14 @@ import static org.learnings.payments.paymentservice.domain.PaymentStatus.INITIAT
 public class CreatePaymentUseCase {
 
     private final PaymentRepository paymentRepository;
-    private final EventMessagePublisher eventMessagePublisher;
     private final TransactionTemplate transactionTemplate;
+    private final EventMessagePublisher eventMessagePublisher;
 
-    public CreatePaymentUseCase(PaymentRepository paymentRepository, EventMessagePublisher eventMessagePublisher,
-                                TransactionTemplate transactionTemplate) {
+    public CreatePaymentUseCase(PaymentRepository paymentRepository, TransactionTemplate transactionTemplate,
+                                EventMessagePublisher eventMessagePublisher) {
         this.paymentRepository = paymentRepository;
-        this.eventMessagePublisher = eventMessagePublisher;
         this.transactionTemplate = transactionTemplate;
+        this.eventMessagePublisher = eventMessagePublisher;
     }
 
     /*
@@ -40,7 +40,7 @@ public class CreatePaymentUseCase {
         Payment savedPayment;
 
         try {
-            savedPayment = saveAndAudit(payment, INITIATED);
+            savedPayment = saveAndPublishEvent(payment, INITIATED);
             log.debug("payment with id [{}] created at [{}]", savedPayment.getPaymentId(), savedPayment.getCreatedDate());
         } catch (DataIntegrityViolationException dae) {
             log.debug("payment creation failed with error: [{}]", dae.getMessage());
@@ -53,7 +53,7 @@ public class CreatePaymentUseCase {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private Payment saveAndAudit(Payment payment, PaymentStatus paymentStatus) {
+    private Payment saveAndPublishEvent(Payment payment, PaymentStatus paymentStatus) {
         return transactionTemplate.execute(_ -> {
             Payment saved = paymentRepository.save(payment);
 
