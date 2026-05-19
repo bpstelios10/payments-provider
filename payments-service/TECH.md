@@ -1,3 +1,27 @@
+## Use Case Safety Guarantees
+
+### createPayment
+
+| Concern | Mechanism |
+|---|---|
+| Idempotency | Unique DB constraint on `idempotencyKey` + catch block returns existing payment |
+| Atomicity | `save` + outbox insert in one `TransactionTemplate` |
+| Duplicate event on retry | Outbox insert also fails on duplicate — no double event |
+| Thread safety | DB constraint is the lock, no shared in-memory state |
+
+### executePayment
+
+| Concern | Mechanism |
+|---|---|
+| Idempotency on gateway | `idempotencyKey` passed to gateway — safe to call multiple times |
+| Concurrent execution prevention | `claimProcessingStatus` with timeout acts as a distributed lock |
+| Atomicity of status + event | Status update + outbox insert in one `TransactionTemplate` |
+| Stuck PROCESSING recovery | Timeout in `claimProcessingStatus` allows retry after N seconds |
+| Gateway succeeds but status update fails | Payment stays PROCESSING — client retries safely, gateway is idempotent |
+| Race condition on status update | `setStatusIfCurrentStatusIs` is a no-op if another thread already updated — event is published with actual persisted status |
+
+---
+
 ## Error Handling Strategy
 
 The system uses deterministic state transitions combined with idempotent request guarantees to prevent duplicate payment execution.
@@ -16,36 +40,22 @@ The service intentionally mirrors production PSP architecture patterns:
 
 * database-per-service
 * idempotent write APIs
-* immutable ledger boundary (future transaction-service)
-* event-driven communication (planned outbox pattern)
+* immutable ledger boundary (transactions-service)
+* event-driven communication via transactional outbox
 * state-machine-driven lifecycle transitions
 
 ---
 
 ## Idempotency-Key Handling
 
-Each payment request must include:
-
-```http
-Idempotency-Key
-```
-
-The key is stored in the database as a unique value.
+Each payment request must include an `idempotency-key`. The key is stored in the database as a unique value.
 
 Behavior:
 
 ```text
-first request → payment created
-second identical request → rejected
+first request  → payment created
+retry request  → original payment returned (idempotent)
 ```
-
-Future improvement (planned):
-
-```text
-second identical request → original response replayed
-```
-
-This mirrors production PSP behavior.
 
 Purpose:
 
@@ -60,14 +70,14 @@ Purpose:
 Payment status transitions follow a controlled lifecycle:
 
 ```text
-CREATED → PROCESSING → SUCCESS
+INITIATED → PROCESSING → CAPTURED
                        → FAILED
 ```
 
 Terminal states:
 
 ```text
-SUCCESS
+CAPTURED
 FAILED
 ```
 
@@ -84,51 +94,34 @@ This prevents race-condition corruption.
 
 Concurrency safety relies on:
 
-* database constraints
-* lifecycle validation
-* unique idempotency keys
-
-Future enhancement:
-
-```text
-optimistic locking via version column
-```
-
-This will prevent conflicting updates during processor callbacks.
+* `claimProcessingStatus` — conditional update that acts as a distributed lock, with a timeout to recover stuck PROCESSING payments
+* DB unique constraint on `idempotencyKey` — prevents duplicate payment creation
+* `setStatusIfCurrentStatusIs` — conditional update guarding all terminal state transitions
 
 ---
 
-## Planned Outbox Pattern
+## Transactional Outbox Pattern
 
-Upcoming architecture change:
+Each business state change is paired with an outbox event in a single transaction:
 
 ```text
 payment write
 +
 outbox event write
-=
-1 transaction
+= 1 transaction
 ```
 
-Publisher worker:
-
-```text
-poll outbox
-publish event
-mark sent
-```
-
-This guarantees:
+A scheduler polls the outbox, publishes to Kafka, and marks records as sent. This guarantees:
 
 * no lost events
 * no distributed transactions
 * reliable service-to-service communication
 
+The outbox mechanism is provided by the `messaging-outbox-spring-jpa` library.
+
 ---
 
 ## Service Ownership Boundaries
-
-Service responsibilities are clearly separated:
 
 payment-service:
 
@@ -138,11 +131,10 @@ external processor coordination
 API orchestration
 ```
 
-transaction-service (planned):
+transactions-service:
 
 ```text
 ledger entries
-account balances
 money movement tracking
 ```
 
@@ -153,75 +145,43 @@ customer notifications
 merchant notifications
 ```
 
-This matches real-world PSP architecture boundaries.
-
 ---
 
 ## Money Representation
 
-Amounts are stored using:
+Amounts are stored using `BigDecimal` + currency string. This prevents floating-point precision errors.
+
+Planned enhancement:
 
 ```text
-BigDecimal
-currency
+currency-aware scale validation (EUR → 2, JPY → 0)
 ```
-
-This prevents floating-point precision errors.
-
-Future enhancement:
-
-```text
-currency-aware scale validation
-```
-
-Example:
-
-```text
-EUR → scale 2
-JPY → scale 0
-```
-
-Required for production-grade ledger correctness.
 
 ---
 
 ## Future Reliability Enhancements
 
-Planned resilience improvements:
+Planned resilience improvements at the gateway adapter boundary:
 
 ```text
 retry
 circuit breaker
-timeout
+timeout handling (timeouts should stay PROCESSING, not transition to FAILED)
 bulkhead isolation
 ```
 
-These will be implemented using:
-
-```text
-Resilience4j
-```
-
-Applied at the processor adapter boundary.
+To be implemented using Resilience4j.
 
 ---
 
 ## Long-Term Target Architecture
 
-Final system flow:
-
 ```text
 Client
   ↓
-payment-service
-  ↓
-outbox event
-  ↓
-transaction-service
-  ↓
-double-entry ledger
-  ↓
-notification-service
+payments-service  ──outbox──▶  transactions-service (ledger)
+                  ──outbox──▶  notification-service (planned)
+                  ──outbox──▶  audit-service (planned)
 ```
 
 This architecture mirrors production PSP system design patterns.

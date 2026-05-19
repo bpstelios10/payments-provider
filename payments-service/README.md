@@ -47,3 +47,25 @@ This service will be the front tier of the PSP, accepting the requests for payme
    b. (Optional) 3D Secure: Redirect user to bank auth page if needed
 
    c. Capture, either immediately (most ecommerce) or later (hotels, shipping, etc.)
+
+## Event Flow
+
+```
+createPayment()
+  → Payment(INITIATED)
+  → outbox: PAYMENT_INITIATED
+
+executePayment()
+  → Payment(PROCESSING)                ← internal lock, no event
+  → gateway call (idempotent)
+      ├── success → Payment(CAPTURED)
+      │             outbox: PAYMENT_CAPTURED
+      │
+      └── failure → Payment(FAILED)
+                    outbox: PAYMENT_FAILED
+```
+
+> If the gateway succeeds but the status update fails, the payment stays PROCESSING.
+> The client retries `executePayment` — the gateway call is idempotent so only the
+> status update and outbox insert run. Both are committed atomically in one transaction.
+
