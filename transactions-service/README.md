@@ -24,3 +24,23 @@ Response:
     "status": "pending"
 }
 ```
+
+## Event Flow
+
+```
+payments-service                          transactions-service
+────────────────                          ────────────────────
+createPayment()
+  → Payment(INITIATED)
+  → outbox: PAYMENT_INITIATED             → consumed by: audit-service (future)
+
+executePayment()
+  → Payment(PROCESSING)                   ← internal lock, not consumed
+  → gateway call (idempotent)
+      ├── success → Payment(CAPTURED)
+      │             outbox: PAYMENT_CAPTURED      → processLedgerEntry() credits merchant
+      │
+      └── failure → Payment(FAILED)
+                    outbox: PAYMENT_FAILED         → consumed by: notification-service (future)
+```
+
