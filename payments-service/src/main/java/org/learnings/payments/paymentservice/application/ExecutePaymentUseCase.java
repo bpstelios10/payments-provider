@@ -11,6 +11,7 @@ import org.learnings.payments.paymentservice.domain.statustransitions.PaymentAct
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -29,17 +30,23 @@ public class ExecutePaymentUseCase {
     private final PaymentRepository paymentRepository;
     private final PaymentActionResolver paymentActionResolver;
     private final PaymentGateway paymentGateway;
+    private final TransactionTemplate transactionTemplate;
+    private final EventMessagePublisher eventMessagePublisher;
 
     public ExecutePaymentUseCase(PaymentRepository paymentRepository, PaymentActionResolver paymentActionResolver,
-                                 PaymentGateway paymentGateway) {
+                                 PaymentGateway paymentGateway, TransactionTemplate transactionTemplate, EventMessagePublisher eventMessagePublisher) {
         this.paymentRepository = paymentRepository;
         this.paymentActionResolver = paymentActionResolver;
         this.paymentGateway = paymentGateway;
+        this.transactionTemplate = transactionTemplate;
+        this.eventMessagePublisher = eventMessagePublisher;
     }
 
-    // This method is not annotated as transactional cause the rest call will keep it open for a long time
-    // so we make it atomic by using Status and no need to rollback in any case of failure.
-    // this is achieved with the PROCESSING status with a timestamp and using idempotency-key on the downstream call.
+    /*
+     * This method is not annotated as transactional cause the rest call will keep it open for a long time
+     * so we make it atomic by using Status and no need to rollback in any case of failure.
+     * this is achieved with the PROCESSING status with a timestamp and using idempotency-key on the downstream call.
+     */
     public PaymentDto execute(long paymentId) {
         PaymentDto paymentDto = getPaymentDtoById(paymentId);
 
@@ -62,15 +69,11 @@ public class ExecutePaymentUseCase {
             nextAction = PaymentStatusAction.FAIL;
         }
 
-        // TODO if this update fails, then something weird is happening. might need to throw some error.
-        //  will also need to check this so later only 1 thread is allowed to do things like notifications, etc
         String nextActionName = nextAction.name();
         PaymentStatus nextStatus = paymentActionResolver.getNextStatus(currentStatus, nextAction)
                 .orElseThrow(() -> new IllegalStateException("No handler for [" + currentStatus + " + " + nextActionName + "]"));
 
-        paymentRepository.setStatusIfCurrentStatusIs(paymentId, nextStatus, currentStatus);
-
-        Payment updated = paymentRepository.findById(paymentId).orElseThrow();
+        Payment updated = updateStatusAndPublishEvent(paymentId, nextStatus, currentStatus);
 
         return PaymentDto.fromPayment(updated);
     }
@@ -91,5 +94,21 @@ public class ExecutePaymentUseCase {
             // TODO i have to check again if the status is now CAPTURED or FAILED to be accurate to avoid retries
             throw new ObjectOptimisticLockingFailureException(Payment.class, paymentId);
         }
+    }
+
+    /*
+     * we first set the current status, if it is valid transition. this is to make it thread safe
+     * if this fails, so some other thread already updated the status, thas's fine cause we get the updated payment next
+     * in any case, we are safe to publish the event, cause we use paymentId+status as idempotency key, for retries.
+     */
+    private Payment updateStatusAndPublishEvent(long paymentId, PaymentStatus nextStatus, PaymentStatus currentStatus) {
+        return transactionTemplate.execute(_ -> {
+            paymentRepository.setStatusIfCurrentStatusIs(paymentId, nextStatus, currentStatus);
+            Payment updated = paymentRepository.findById(paymentId).orElseThrow();
+
+            eventMessagePublisher.publish(
+                    new EventMessage(paymentId, "PAYMENT", updated.getStatus().name(), updated));
+            return updated;
+        });
     }
 }
