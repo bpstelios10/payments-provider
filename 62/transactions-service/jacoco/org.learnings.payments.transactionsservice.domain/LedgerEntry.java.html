@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LedgerEntry.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">transactions-service</a> &gt; <a href="index.source.html" class="el_package">org.learnings.payments.transactionsservice.domain</a> &gt; <span class="el_source">LedgerEntry.java</span></div><h1>LedgerEntry.java</h1><pre class="source lang-java linenums">package org.learnings.payments.transactionsservice.domain;
+
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.UUID;
+
+@Entity
+@Table(name = &quot;ledger_entries&quot;,
+        uniqueConstraints = {
+                @UniqueConstraint(name = LedgerEntry.UNIQUE_LEDGER_ENTRY_IDEMPOTENCY_KEY, columnNames = {&quot;eventId&quot;})
+        })
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // for JPA
+@EqualsAndHashCode
+public class LedgerEntry {
+
+    public static final String UNIQUE_LEDGER_ENTRY_IDEMPOTENCY_KEY = &quot;UNIQUE_LEDGER_ENTRY_IDEMPOTENCY_KEY&quot;;
+
+    public LedgerEntry(UUID eventId, Long paymentId, LedgerType type, BigDecimal amount,
+<span class="fc" id="L27">                       String currency, UUID referenceId, Instant paymentOccurredAt) {</span>
+<span class="fc" id="L28">        this.eventId = eventId;</span>
+<span class="fc" id="L29">        this.paymentId = paymentId;</span>
+<span class="fc" id="L30">        this.type = type;</span>
+<span class="fc" id="L31">        this.amount = amount;</span>
+<span class="fc" id="L32">        this.currency = currency;</span>
+<span class="fc" id="L33">        this.referenceId = referenceId;</span>
+<span class="fc" id="L34">        this.paymentOccurredAt = paymentOccurredAt;</span>
+<span class="fc" id="L35">    }</span>
+
+    @Id
+    @GeneratedValue
+    private UUID id;
+    @Column(nullable = false)
+    private UUID eventId;
+    @Column(nullable = false)
+    private Long paymentId;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private LedgerType type;
+    @Column(nullable = false, precision = 19, scale = 2)
+    private BigDecimal amount;
+    private String currency;
+    private UUID referenceId;
+    private Instant paymentOccurredAt;
+    @SuppressWarnings({&quot;UnusedDeclaration&quot;})
+    @CreationTimestamp
+    private Instant createdAt;
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.13.202504020838</span></div></body></html>
