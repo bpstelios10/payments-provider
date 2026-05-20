@@ -11,7 +11,12 @@ ext {
             assertj: '3.27.7',
             kafkaClients: '4.2.0',
             jacksonDatabind: '3.1.0',
-            slf4j: '2.0.17'
+            slf4j: '2.0.17',
+            micrometerPrometheus: '1.17.0-M3',
+            // not Spring BOM related
+            postgreSql: '42.7.8',
+            awaitility: '4.3.0',
+            lombok: '1.18.44'
     ]
 
     javaProjects = ['payments-service', 'transactions-service', 'messaging-outbox-core', 'messaging-outbox-spring-jpa', 'messaging-events-core']
@@ -60,11 +65,10 @@ subprojects { subproj ->
             implementation 'org.springframework.boot:spring-boot-starter-actuator'
             implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-            implementation 'io.micrometer:micrometer-registry-prometheus:1.16.5'
-            implementation 'io.prometheus:simpleclient_hotspot:0.16.0'
+            implementation "io.micrometer:micrometer-registry-prometheus:${versions.micrometerPrometheus}"
 
-            compileOnly 'org.projectlombok:lombok:1.18.44'
-            annotationProcessor 'org.projectlombok:lombok:1.18.44'
+            compileOnly "org.projectlombok:lombok:${versions.lombok}"
+            annotationProcessor "org.projectlombok:lombok:${versions.lombok}"
 
             testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
         }
