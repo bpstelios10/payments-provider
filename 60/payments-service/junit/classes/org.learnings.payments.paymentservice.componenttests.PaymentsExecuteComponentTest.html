@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - PaymentsExecuteComponentTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>PaymentsExecuteComponentTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/org.learnings.payments.paymentservice.componenttests.html">org.learnings.payments.paymentservice.componenttests</a> &gt; PaymentsExecuteComponentTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">7</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">3.242s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a href="#">Tests</a>
+</li>
+<li>
+<a href="#">Standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">executePayment_succeeds()</td>
+<td class="success">executePayment_succeeds()</td>
+<td class="success">0.034s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">executePayment_whenGatewayFails_succeedsWithFailedStatus()</td>
+<td class="success">executePayment_whenGatewayFails_succeedsWithFailedStatus()</td>
+<td class="success">0.034s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[1] paymentId = &quot;&quot;, errorStatusCode = &quot;404&quot;</td>
+<td class="success">executePayment_whenInvalidInput_throwsBadRequest(String, int)[1]</td>
+<td class="success">0.032s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">[2] paymentId = &quot; &quot;, errorStatusCode = &quot;400&quot;</td>
+<td class="success">executePayment_whenInvalidInput_throwsBadRequest(String, int)[2]</td>
+<td class="success">0.015s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">executePayment_whenNotExistedPayment_throwsNotFound()</td>
+<td class="success">executePayment_whenNotExistedPayment_throwsNotFound()</td>
+<td class="success">0.015s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">executePayment_whenProcessingThreadFailsAndTimeoutPeriodPasses_thenNextThreadFinishesProcessing()</td>
+<td class="success">executePayment_whenProcessingThreadFailsAndTimeoutPeriodPasses_thenNextThreadFinishesProcessing()</td>
+<td class="success">3.038s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">executePayment_whenRaceCondition_shouldTriggerLockException()</td>
+<td class="success">executePayment_whenRaceCondition_shouldTriggerLockException()</td>
+<td class="success">0.074s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre id="class-stdout">20-05-2026 18:59:36.515 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.t.c.s.AnnotationConfigContextLoaderUtils.detectDefaultConfigurationClasses - Could not detect default configuration classes for test class [org.learnings.payments.paymentservice.componenttests.PaymentsExecuteComponentTest]: PaymentsExecuteComponentTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20-05-2026 18:59:36.519 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.b.t.c.SpringBootTestContextBootstrapper.getOrFindConfigurationClasses - Found @SpringBootConfiguration org.learnings.payments.paymentservice.PaymentsServiceApplication for test class org.learnings.payments.paymentservice.componenttests.PaymentsExecuteComponentTest
+20-05-2026 18:59:36.520 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.t.c.s.AnnotationConfigContextLoaderUtils.detectDefaultConfigurationClasses - Could not detect default configuration classes for test class [org.learnings.payments.paymentservice.componenttests.PaymentsExecuteComponentTest]: PaymentsExecuteComponentTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20-05-2026 18:59:36.521 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.t.c.s.AnnotationConfigContextLoaderUtils.detectDefaultConfigurationClasses - Could not detect default configuration classes for test class [org.learnings.payments.paymentservice.componenttests.PaymentsComponentTestBase]: PaymentsComponentTestBase does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+20-05-2026 18:59:36.523 ?[35m[Test worker]?[0;39m ?[34mINFO ?[0;39m o.s.b.t.c.SpringBootTestContextBootstrapper.getOrFindConfigurationClasses - Found @SpringBootConfiguration org.learnings.payments.paymentservice.PaymentsServiceApplication for test class org.learnings.payments.paymentservice.componenttests.PaymentsExecuteComponentTest
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: delete from outbox_event where id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: delete from payments where payment_id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+20-05-2026 18:59:36.588 ?[35m[Test worker]?[0;39m ?[31mWARN ?[0;39m o.s.w.s.m.s.DefaultHandlerExceptionResolver.logException - Resolved [org.springframework.web.bind.MissingPathVariableException: Required URI template variable 'paymentId' for method parameter type Long is present but converted to null]
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: insert into payments (amount,created_date,currency,idempotency_key,merchant_id,processing_started_at,status,updated_date) values (?,?,?,?,?,?,?,?)
+##### [pool-2-thread-2] - starting
+##### [Test worker] - before blocking the futures
+##### [pool-2-thread-3] - starting
+##### [pool-2-thread-1] - starting
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: update payments p1_0 set status='PROCESSING',processing_started_at=?,updated_date=? where p1_0.payment_id=? and (p1_0.status='INITIATED' or (p1_0.status='PROCESSING' and p1_0.processing_started_at&lt;?))
+Hibernate: update payments p1_0 set status='PROCESSING',processing_started_at=?,updated_date=? where p1_0.payment_id=? and (p1_0.status='INITIATED' or (p1_0.status='PROCESSING' and p1_0.processing_started_at&lt;?))
+Hibernate: update payments p1_0 set status='PROCESSING',processing_started_at=?,updated_date=? where p1_0.payment_id=? and (p1_0.status='INITIATED' or (p1_0.status='PROCESSING' and p1_0.processing_started_at&lt;?))
+##### [pool-2-thread-3] - inside payment-gateway
+##### [pool-2-thread-3] - continue after payment-gateway
+Hibernate: update payments p1_0 set status=?,updated_date=localtimestamp where p1_0.payment_id=? and p1_0.status=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: insert into outbox_event (aggregate_id,aggregate_type,created_at,event_type,failed,last_error,next_retry_at,payload,published,retry_count,id) values (?,?,?,?,?,?,?,?,?,?,?)
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0 where oe1_0.aggregate_id=? and oe1_0.aggregate_type=? and oe1_0.event_type=?
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: delete from outbox_event where id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: delete from payments where payment_id=?
+Hibernate: insert into payments (amount,created_date,currency,idempotency_key,merchant_id,processing_started_at,status,updated_date) values (?,?,?,?,?,?,?,?)
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: update payments p1_0 set status='PROCESSING',processing_started_at=?,updated_date=? where p1_0.payment_id=? and (p1_0.status='INITIATED' or (p1_0.status='PROCESSING' and p1_0.processing_started_at&lt;?))
+Hibernate: update payments p1_0 set status=?,updated_date=localtimestamp where p1_0.payment_id=? and p1_0.status=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: insert into outbox_event (aggregate_id,aggregate_type,created_at,event_type,failed,last_error,next_retry_at,payload,published,retry_count,id) values (?,?,?,?,?,?,?,?,?,?,?)
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0 where oe1_0.aggregate_id=? and oe1_0.aggregate_type=? and oe1_0.event_type=?
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: delete from outbox_event where id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: delete from payments where payment_id=?
+Hibernate: insert into payments (amount,created_date,currency,idempotency_key,merchant_id,processing_started_at,status,updated_date) values (?,?,?,?,?,?,?,?)
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: update payments p1_0 set status='PROCESSING',processing_started_at=?,updated_date=? where p1_0.payment_id=? and (p1_0.status='INITIATED' or (p1_0.status='PROCESSING' and p1_0.processing_started_at&lt;?))
+Hibernate: update payments p1_0 set status=?,updated_date=localtimestamp where p1_0.payment_id=? and p1_0.status=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: insert into outbox_event (aggregate_id,aggregate_type,created_at,event_type,failed,last_error,next_retry_at,payload,published,retry_count,id) values (?,?,?,?,?,?,?,?,?,?,?)
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0 where oe1_0.aggregate_id=? and oe1_0.aggregate_type=? and oe1_0.event_type=?
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: delete from outbox_event where id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: delete from payments where payment_id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: insert into payments (amount,created_date,currency,idempotency_key,merchant_id,processing_started_at,status,updated_date) values (?,?,?,?,?,?,?,?)
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: update payments p1_0 set status='PROCESSING',processing_started_at=?,updated_date=? where p1_0.payment_id=? and (p1_0.status='INITIATED' or (p1_0.status='PROCESSING' and p1_0.processing_started_at&lt;?))
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: update payments p1_0 set status='PROCESSING',processing_started_at=?,updated_date=? where p1_0.payment_id=? and (p1_0.status='INITIATED' or (p1_0.status='PROCESSING' and p1_0.processing_started_at&lt;?))
+Hibernate: update payments p1_0 set status=?,updated_date=localtimestamp where p1_0.payment_id=? and p1_0.status=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: insert into outbox_event (aggregate_id,aggregate_type,created_at,event_type,failed,last_error,next_retry_at,payload,published,retry_count,id) values (?,?,?,?,?,?,?,?,?,?,?)
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0 where p1_0.payment_id=?
+Hibernate: select p1_0.payment_id,p1_0.amount,p1_0.created_date,p1_0.currency,p1_0.idempotency_key,p1_0.merchant_id,p1_0.processing_started_at,p1_0.status,p1_0.updated_date from payments p1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0 where oe1_0.aggregate_id=? and oe1_0.aggregate_type=? and oe1_0.event_type=?
+</pre>
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="class-stdout">Copy</button>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.2.0</a> at May 20, 2026, 6:59:58 PM</p>
+</div>
+</div>
+</body>
+</html>
