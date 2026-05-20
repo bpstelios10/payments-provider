@@ -2,7 +2,7 @@ package org.learnings.payments.transactionsservice.adapters.inbound.messaging;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.EventEnvelope;
+import org.learnings.payments.messaging.events.EventEnvelope;
 import org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.PaymentEventPayload;
 import org.learnings.payments.transactionsservice.application.ProcessLedgerEntryUseCase;
 import org.learnings.payments.transactionsservice.application.dtos.LedgerEntryDto;
@@ -15,7 +15,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.EventType.PAYMENT_CAPTURED;
+import static org.learnings.payments.messaging.events.EventType.PAYMENT_CAPTURED;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 

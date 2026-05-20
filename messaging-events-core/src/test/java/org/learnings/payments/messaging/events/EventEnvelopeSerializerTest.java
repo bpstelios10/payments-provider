@@ -1,14 +1,13 @@
-package org.learnings.payments.transactionsservice.adapters.inbound.messaging.model;
+package org.learnings.payments.messaging.events;
 
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.EventType.PAYMENT_CAPTURED;
+import static org.learnings.payments.messaging.events.EventType.PAYMENT_CAPTURED;
 
 class EventEnvelopeSerializerTest {
 
@@ -16,11 +15,8 @@ class EventEnvelopeSerializerTest {
 
     @Test
     void serialize_whenValidData_returnsSerializedBytes() {
-        Instant paymentOccurredAt = Instant.now();
-        PaymentEventPayload payload =
-                new PaymentEventPayload(123L, BigDecimal.valueOf(100.00), "USD", paymentOccurredAt);
-        EventEnvelope<PaymentEventPayload> envelope =
-                new EventEnvelope<>(UUID.randomUUID(), PAYMENT_CAPTURED, payload, paymentOccurredAt.plusSeconds(1));
+        EventEnvelope<TestPayload> envelope =
+                new EventEnvelope<>(UUID.randomUUID(), PAYMENT_CAPTURED, new TestPayload("val"), Instant.now());
 
         byte[] result = serializer.serialize("topic", envelope);
 
@@ -44,6 +40,8 @@ class EventEnvelopeSerializerTest {
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Error serializing EventEnvelope");
     }
+
+    record TestPayload(String value) {}
 
     static class UnserializablePayload {
         public String getValue() {
