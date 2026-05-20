@@ -1,6 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '4.1.0-M4' apply false
-    id 'io.spring.dependency-management' version '1.1.7' apply false
+    id 'org.springframework.boot' version "${springBootVersion}" apply false
+    id 'io.spring.dependency-management' version "${dependencyManagementVersion}" apply false
 }
 
 ext {
@@ -8,7 +8,10 @@ ext {
             // the versions should match whatever our spring version is using
             junitJupiter: '6.0.3',
             mockitoJunitJupiter: '5.23.0',
-            assertj: '3.27.7'
+            assertj: '3.27.7',
+            kafkaClients: '4.2.0',
+            jacksonDatabind: '3.1.0',
+            slf4j: '2.0.17'
     ]
 
     javaProjects = ['payments-service', 'transactions-service', 'messaging-outbox-core', 'messaging-outbox-spring-jpa', 'messaging-events-core']
@@ -25,6 +28,8 @@ allprojects {
 }
 
 subprojects { subproj ->
+    ext.versions = rootProject.ext.versions
+
     if (javaProjects.contains(subproj.name)) {
         apply plugin: 'java'
 
