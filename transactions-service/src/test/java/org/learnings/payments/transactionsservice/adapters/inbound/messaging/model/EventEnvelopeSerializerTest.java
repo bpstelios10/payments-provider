@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.EventType.PAYMENT_CAPTURED;
 
 class EventEnvelopeSerializerTest {
@@ -34,9 +35,19 @@ class EventEnvelopeSerializerTest {
         assertThat(result).isNull();
     }
 
-    //    @Test
+    @Test
     void serialize_whenSerializationFails_throwsRuntimeException() {
-        // To simulate failure, perhaps pass an object that can't be serialized, but since it's record, hard.
-        // For now, assume it works. maybe no need for failure test.
+        EventEnvelope<Object> envelope = new EventEnvelope<>(UUID.randomUUID(), PAYMENT_CAPTURED,
+                new UnserializablePayload(), Instant.now());
+
+        assertThatThrownBy(() -> serializer.serialize("topic", envelope))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Error serializing EventEnvelope");
+    }
+
+    static class UnserializablePayload {
+        public String getValue() {
+            throw new RuntimeException("cannot serialize");
+        }
     }
 }
