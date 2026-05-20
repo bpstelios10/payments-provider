@@ -11,7 +11,7 @@ ext {
             assertj: '3.27.7'
     ]
 
-    javaProjects = ['payments-service', 'transactions-service', 'messaging-outbox-core', 'messaging-outbox-spring-jpa']
+    javaProjects = ['payments-service', 'transactions-service', 'messaging-outbox-core', 'messaging-outbox-spring-jpa', 'messaging-events-core']
     springWebProjects = ['payments-service', 'transactions-service']
 }
 
@@ -35,6 +35,7 @@ subprojects { subproj ->
 
         dependencies {
             testImplementation("org.junit.jupiter:junit-jupiter-api:${versions.junitJupiter}")
+            testImplementation("org.junit.jupiter:junit-jupiter-params:${versions.junitJupiter}")
             testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${versions.junitJupiter}")
             testRuntimeOnly("org.junit.platform:junit-platform-launcher:${versions.junitJupiter}")
             testImplementation("org.mockito:mockito-junit-jupiter:${versions.mockitoJunitJupiter}")

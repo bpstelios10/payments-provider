@@ -1,6 +1,6 @@
 package org.learnings.payments.transactionsservice.adapters.inbound.messaging;
 
-import org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.EventEnvelope;
+import org.learnings.payments.messaging.events.EventEnvelope;
 import org.learnings.payments.transactionsservice.adapters.inbound.messaging.model.PaymentEventPayload;
 import org.learnings.payments.transactionsservice.domain.LedgerType;
 import org.learnings.payments.transactionsservice.application.dtos.LedgerEntryDto;

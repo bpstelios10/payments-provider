@@ -1,0 +1,15 @@
+version = '1.0-SNAPSHOT'
+
+apply plugin: 'io.spring.dependency-management'
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:4.1.0-M4"
+    }
+}
+
+dependencies {
+    implementation 'org.apache.kafka:kafka-clients'
+    implementation 'tools.jackson.core:jackson-databind'
+    implementation 'org.slf4j:slf4j-api'
+}
