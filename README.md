@@ -16,11 +16,37 @@ The goal of the project is to explore:
 
 The system currently includes:
 
-* payment-service (implemented)
-* transaction-service (planned)
-* notification-service (planned)
+| Module | Type | Status |
+|---|---|---|
+| [`payments-service`](payments-service) | Service: payment lifecycle, gateway orchestration, outbox | Implemented (gateway + Kafka sender stubbed) |
+| [`transactions-service`](transactions-service) | Service: consumes payment events, writes ledger entries | Implemented (single-entry ledger) |
+| [`messaging-outbox-core`](messaging-outbox-core) | Library: framework-free outbox processing | Implemented |
+| [`messaging-outbox-spring-jpa`](messaging-outbox-spring-jpa) | Library: Spring/JPA outbox polling | Implemented |
+| [`messaging-events-core`](messaging-events-core) | Library: event envelope + Kafka (de)serializers | Implemented |
+| notification-service | Service | Planned |
 
 Architecture follows the **database-per-service** microservices pattern.
+
+## Documentation
+
+* [Architecture](docs/ARCHITECTURE.md): modules, layering, flows, outbox, idempotency
+* [Architecture Decision Records](docs/adr): why things are the way they are
+* [Code Review](docs/CODE_REVIEW.md): prioritised gaps against a production PSP bar
+* [Roadmap](docs/ROADMAP.md): path towards a full payments provider
+* [payments-service tech notes](payments-service/TECH.md)
+
+## Build & Run
+
+Requires JDK 25 and Docker.
+
+```bash
+./gradlew build                  # compile, test, enforce JaCoCo coverage
+./gradlew :payments-service:bootRun
+docker compose up --build        # requires ./gradlew build first (images copy build/libs/service.jar)
+```
+
+* Business API: `http://localhost:8090/payments-service/payments`, which is payments-service in compose
+* Health/metrics: management port `8081`, `/<service>/private/health` and `/<service>/private/metrics`
 
 ---
 
