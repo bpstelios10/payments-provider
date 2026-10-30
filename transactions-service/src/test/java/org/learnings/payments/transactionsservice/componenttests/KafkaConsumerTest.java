@@ -12,6 +12,7 @@ import org.learnings.payments.transactionsservice.domain.LedgerEntry;
 import org.learnings.payments.transactionsservice.domain.LedgerType;
 import org.learnings.payments.transactionsservice.domain.repositories.LedgerEntryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.kafka.autoconfigure.KafkaConfigBuilder;
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -64,7 +65,7 @@ class KafkaConsumerTest {
     @BeforeEach
     void setupRawTemplate(@Autowired KafkaListenerEndpointRegistry registry,
                           @Autowired EmbeddedKafkaBroker embeddedKafkaBroker) {
-        Map<String, Object> props = properties.buildProducerProperties();
+        Map<String, Object> props = KafkaConfigBuilder.of(properties).producer().build();
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         DefaultKafkaProducerFactory<String, String> factory = new DefaultKafkaProducerFactory<>(props);

@@ -6,17 +6,17 @@ plugins {
 ext {
     versions = [
             // the versions should match whatever our spring version is using
-            junitJupiter: '6.0.3',
-            mockitoJunitJupiter: '5.23.0',
+            junitJupiter: '6.1.3',
+            mockitoJunitJupiter: '5.24.0',
             assertj: '3.27.7',
-            kafkaClients: '4.2.0',
-            jacksonDatabind: '3.1.0',
-            slf4j: '2.0.17',
-            micrometerPrometheus: '1.17.0-M3',
+            kafkaClients: '4.4.0',
+            jacksonDatabind: '3.2.4',
+            slf4j: '2.0.20',
+            micrometerPrometheus: '1.18.0-RC1',
             // not Spring BOM related
-            postgreSql: '42.7.8',
+            postgreSql: '42.7.14',
             awaitility: '4.3.0',
-            lombok: '1.18.44'
+            lombok: '1.18.48'
     ]
 
     javaProjects = ['payments-service', 'transactions-service', 'messaging-outbox-core', 'messaging-outbox-spring-jpa', 'messaging-events-core']
@@ -78,7 +78,7 @@ subprojects { subproj ->
 
         tasks.withType(Test).configureEach {
             // Increase this to 1536m or 2048m for Embedded Kafka
-            maxHeapSize = "1024m"
+            maxHeapSize = "2g"
 
             // Reduces memory pressure by running tests sequentially
 //            maxParallelForks = 1
