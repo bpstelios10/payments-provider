@@ -35,7 +35,7 @@ allprojects {
 subprojects { subproj ->
     ext.versions = rootProject.ext.versions
 
-    if (javaProjects.contains(subproj.name)) {
+    if (rootProject.javaProjects.contains(subproj.name)) {
         apply plugin: 'java'
 
         java {
@@ -56,7 +56,7 @@ subprojects { subproj ->
         apply from: '../gradle/jacoco.gradle'
     }
 
-    if (springWebProjects.contains(subproj.name)) {
+    if (rootProject.springWebProjects.contains(subproj.name)) {
         apply plugin: 'org.springframework.boot'
         apply plugin: 'io.spring.dependency-management'
 
