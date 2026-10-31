@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - scheduler_whenOutboxEventsExistButKafkaFails_publishesFails()</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<div class="breadcrumbs">
+<a class="breadcrumb" href="../index.html">all</a> &gt; 
+<a class="breadcrumb" href="index.html">org.learnings.payments.paymentservice.componenttests.SchedulerWithMockedOutboxRepositoryComponentTest</a> &gt; 
+<span class="breadcrumb">scheduler_whenOutboxEventsExistButKafkaFails_publishesFails()</span>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a class="successGroup" href="#">Gradle Test Run :payments-service:test</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Gradle Test Run :payments-service:test</h2>
+<h1>scheduler_whenOutboxEventsExistButKafkaFails_publishesFails()</h1>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a class="" href="#">summary</a>
+</li>
+<li>
+<a class="" href="#">standard output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>summary</h2>
+<div>
+<div class="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox">
+<div class="counter">0</div>
+<p>skipped</p>
+</div>
+</td>
+<td>
+<div class="infoBox duration">
+<div class="counter">1.013s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="tab">
+<h2>standard output</h2>
+<span class="code">
+<div class="clipboard-copy-btn-container">
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="root-0-test-stdout-scheduler_whenOutboxEventsExistButKafkaFails_publishesFails()">Copy</button>
+</div>
+<pre id="root-0-test-stdout-scheduler_whenOutboxEventsExistButKafkaFails_publishesFails()">31-10-2026 13:50:58.407 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.s.t.c.s.DirtiesContextBeforeModesTestExecutionListener.beforeOrAfterTestMethod - Before test method: class [SchedulerWithMockedOutboxRepositoryComponentTest], method [scheduler_whenOutboxEventsExistButKafkaFails_publishesFails], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+31-10-2026 13:50:58.407 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.springframework.test.context.cache.logStatistics - Spring test ApplicationContext cache statistics: [DefaultContextCache@312312b3 size = 4, maxSize = 32, contextUsageCount = 1, parentContextCount = 0, hitCount = 346, missCount = 4, failureCount = 0]
+31-10-2026 13:50:58.407 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.springframework.test.context.cache.logStatistics - Spring test ApplicationContext cache statistics: [DefaultContextCache@312312b3 size = 4, maxSize = 32, contextUsageCount = 1, parentContextCount = 0, hitCount = 347, missCount = 4, failureCount = 0]
+31-10-2026 13:50:58.408 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.springframework.test.context.cache.logStatistics - Spring test ApplicationContext cache statistics: [DefaultContextCache@312312b3 size = 4, maxSize = 32, contextUsageCount = 1, parentContextCount = 0, hitCount = 348, missCount = 4, failureCount = 0]
+31-10-2026 13:50:58.408 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.getTransaction - Creating new transaction with name [org.springframework.data.jpa.repository.support.SimpleJpaRepository.save]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+31-10-2026 13:50:58.408 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.openSession - HHH006588: Opening session [tenant=null]
+31-10-2026 13:50:58.408 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doBegin - Opened new EntityManager [SessionImpl(1042603955&lt;open&gt;)] for JPA transaction
+31-10-2026 13:50:58.409 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.begin - HHH006583: Beginning transaction
+31-10-2026 13:50:58.409 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doBegin - Exposing JPA transaction as JDBC [org.springframework.orm.jpa.vendor.HibernateJpaDialect$HibernateConnectionHandle@33c0e8e8]
+31-10-2026 13:50:58.409 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.processCommit - Initiating transaction commit
+31-10-2026 13:50:58.410 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doCommit - Committing JPA transaction on EntityManager [SessionImpl(1042603955&lt;open&gt;)]
+31-10-2026 13:50:58.410 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.commit - HHH006584: Committing transaction
+31-10-2026 13:50:58.410 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.event.logFlushResults - HHH90060071: Flushed: 1 insertions, 0 updates, 0 deletions to 1 objects
+31-10-2026 13:50:58.410 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.event.logFlushResults - HHH90060072: Flushed: 0 (re)creations, 0 updates, 0 removals to 0 collections
+31-10-2026 13:50:58.410 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.logEntities - Listing entities:
+31-10-2026 13:50:58.410 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.logEntities - org.learnings.payments.messaging.outbox.jpa.OutboxEvent{createdAt=null, aggregateId=1, lastError=null, nextRetryAt=2026-10-31T13:50:58.408Z, payload={}, retryCount=0, id=da09c8dd-1cd5-45a9-a3fb-24a8e02fd915, eventType=INITIATED, failed=false, published=false, aggregateType=PAYMENT}
+31-10-2026 13:50:58.411 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.SQL.logStatement - insert into outbox_event (aggregate_id,aggregate_type,created_at,event_type,failed,last_error,next_retry_at,payload,published,retry_count,id) values (?,?,?,?,?,?,?,?,?,?,?)
+Hibernate: insert into outbox_event (aggregate_id,aggregate_type,created_at,event_type,failed,last_error,next_retry_at,payload,published,retry_count,id) values (?,?,?,?,?,?,?,?,?,?,?)
+31-10-2026 13:50:58.412 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doCleanupAfterCompletion - Closing JPA EntityManager after transaction
+31-10-2026 13:50:58.412 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.session.metrics.end - HHH000401: Logging session metrics:
+	23285 ns acquiring 1 JDBC connections
+	0 ns releasing 0 JDBC connections
+	168926 ns preparing 1 JDBC statements
+	352453 ns executing 1 JDBC statements
+	0 ns executing 0 JDBC batches
+	0 ns performing 0 second-level cache puts
+	0 ns performing 0 second-level cache hits
+	0 ns performing 0 second-level cache misses
+	1763559 ns executing 1 flushes (flushing a total of 1 entities and 0 collections)
+	0 ns executing 0 pre-partial-flushes
+	0 ns executing 0 partial-flushes (flushing a total of 0 entities and 0 collections)
+
+31-10-2026 13:50:58.886 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.getTransaction - Creating new transaction with name [org.learnings.payments.messaging.outbox.jpa.OutboxEventProcessorRunner.run]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT
+31-10-2026 13:50:58.886 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.openSession - HHH006588: Opening session [tenant=null]
+31-10-2026 13:50:58.886 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doBegin - Opened new EntityManager [SessionImpl(1468209570&lt;open&gt;)] for JPA transaction
+31-10-2026 13:50:58.886 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.begin - HHH006583: Beginning transaction
+31-10-2026 13:50:58.886 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doBegin - Exposing JPA transaction as JDBC [org.springframework.orm.jpa.vendor.HibernateJpaDialect$HibernateConnectionHandle@667df357]
+31-10-2026 13:50:58.887 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.SQL.logStatement - SELECT * FROM outbox_event
+WHERE published = false
+  AND failed = false
+  AND next_retry_at &lt;= ?
+ORDER BY created_at
+LIMIT 100
+FOR UPDATE SKIP LOCKED
+Hibernate: SELECT * FROM outbox_event
+WHERE published = false
+  AND failed = false
+  AND next_retry_at &lt;= ?
+ORDER BY created_at
+LIMIT 100
+FOR UPDATE SKIP LOCKED
+31-10-2026 13:50:58.889 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.results.disallowPositionalSelections - Disallowing positional selections: SELECT * FROM outbox_event
+WHERE published = false
+  AND failed = false
+  AND next_retry_at &lt;= :now
+ORDER BY created_at
+LIMIT 100
+FOR UPDATE SKIP LOCKED
+31-10-2026 13:50:58.890 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.processCommit - Initiating transaction commit
+31-10-2026 13:50:58.890 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doCommit - Committing JPA transaction on EntityManager [SessionImpl(1468209570&lt;open&gt;)]
+31-10-2026 13:50:58.890 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.commit - HHH006584: Committing transaction
+31-10-2026 13:50:58.890 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.event.logFlushResults - HHH90060071: Flushed: 0 insertions, 1 updates, 0 deletions to 1 objects
+31-10-2026 13:50:58.890 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.event.logFlushResults - HHH90060072: Flushed: 0 (re)creations, 0 updates, 0 removals to 0 collections
+31-10-2026 13:50:58.890 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.logEntities - Listing entities:
+31-10-2026 13:50:58.890 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.logEntities - org.learnings.payments.messaging.outbox.jpa.OutboxEvent{createdAt=2026-10-31T13:50:58.410909Z, aggregateId=1, lastError=null, nextRetryAt=2026-10-31T13:51:08.890Z, payload={}, retryCount=1, id=da09c8dd-1cd5-45a9-a3fb-24a8e02fd915, eventType=INITIATED, failed=false, published=false, aggregateType=PAYMENT}
+31-10-2026 13:50:58.891 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.SQL.logStatement - update outbox_event set aggregate_id=?,aggregate_type=?,event_type=?,failed=?,last_error=?,next_retry_at=?,payload=?,published=?,retry_count=? where id=?
+Hibernate: update outbox_event set aggregate_id=?,aggregate_type=?,event_type=?,failed=?,last_error=?,next_retry_at=?,payload=?,published=?,retry_count=? where id=?
+31-10-2026 13:50:58.891 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doCleanupAfterCompletion - Closing JPA EntityManager after transaction
+31-10-2026 13:50:58.892 ?[35m[scheduling-1]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.session.metrics.end - HHH000401: Logging session metrics:
+	46741 ns acquiring 1 JDBC connections
+	0 ns releasing 0 JDBC connections
+	507588 ns preparing 2 JDBC statements
+	701081 ns executing 2 JDBC statements
+	0 ns executing 0 JDBC batches
+	0 ns performing 0 second-level cache puts
+	0 ns performing 0 second-level cache hits
+	0 ns performing 0 second-level cache misses
+	1337996 ns executing 2 flushes (flushing a total of 1 entities and 0 collections)
+	0 ns executing 0 pre-partial-flushes
+	4286 ns executing 1 partial-flushes (flushing a total of 0 entities and 0 collections)
+
+31-10-2026 13:50:59.414 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.getTransaction - Creating new transaction with name [org.springframework.data.jpa.repository.support.SimpleJpaRepository.findById]: PROPAGATION_REQUIRED,ISOLATION_DEFAULT,readOnly
+31-10-2026 13:50:59.414 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.openSession - HHH006588: Opening session [tenant=null]
+31-10-2026 13:50:59.414 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doBegin - Opened new EntityManager [SessionImpl(1511385071&lt;open&gt;)] for JPA transaction
+31-10-2026 13:50:59.414 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m o.s.jdbc.datasource.DataSourceUtils.prepareConnectionForTransaction - Setting JDBC Connection [HikariProxyConnection@521630409 wrapping conn30: url=jdbc:h2:mem:payments user=DBUSER] read-only
+31-10-2026 13:50:59.414 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.begin - HHH006583: Beginning transaction
+31-10-2026 13:50:59.414 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doBegin - Exposing JPA transaction as JDBC [org.springframework.orm.jpa.vendor.HibernateJpaDialect$HibernateConnectionHandle@23a29cc0]
+31-10-2026 13:50:59.415 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.SQL.logStatement - select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0 where oe1_0.id=?
+Hibernate: select oe1_0.id,oe1_0.aggregate_id,oe1_0.aggregate_type,oe1_0.created_at,oe1_0.event_type,oe1_0.failed,oe1_0.last_error,oe1_0.next_retry_at,oe1_0.payload,oe1_0.published,oe1_0.retry_count from outbox_event oe1_0 where oe1_0.id=?
+31-10-2026 13:50:59.416 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.processCommit - Initiating transaction commit
+31-10-2026 13:50:59.416 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doCommit - Committing JPA transaction on EntityManager [SessionImpl(1511385071&lt;open&gt;)]
+31-10-2026 13:50:59.416 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.orm.core.commit - HHH006584: Committing transaction
+31-10-2026 13:50:59.417 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m o.s.jdbc.datasource.DataSourceUtils.resetConnectionAfterTransaction - Resetting read-only flag of JDBC Connection [HikariProxyConnection@521630409 wrapping conn30: url=jdbc:h2:mem:payments user=DBUSER]
+31-10-2026 13:50:59.417 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m o.s.orm.jpa.JpaTransactionManager.doCleanupAfterCompletion - Closing JPA EntityManager after transaction
+31-10-2026 13:50:59.417 ?[35m[awaitility-thread]?[0;39m ?[39mDEBUG?[0;39m org.hibernate.session.metrics.end - HHH000401: Logging session metrics:
+	63256 ns acquiring 1 JDBC connections
+	0 ns releasing 0 JDBC connections
+	330460 ns preparing 1 JDBC statements
+	247134 ns executing 1 JDBC statements
+	0 ns executing 0 JDBC batches
+	0 ns performing 0 second-level cache puts
+	0 ns performing 0 second-level cache hits
+	0 ns performing 0 second-level cache misses
+	0 ns executing 0 flushes (flushing a total of 0 entities and 0 collections)
+	0 ns executing 0 pre-partial-flushes
+	0 ns executing 0 partial-flushes (flushing a total of 0 entities and 0 collections)
+
+31-10-2026 13:50:59.419 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.springframework.test.context.cache.logStatistics - Spring test ApplicationContext cache statistics: [DefaultContextCache@312312b3 size = 4, maxSize = 32, contextUsageCount = 1, parentContextCount = 0, hitCount = 349, missCount = 4, failureCount = 0]
+31-10-2026 13:50:59.419 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.springframework.test.context.cache.logStatistics - Spring test ApplicationContext cache statistics: [DefaultContextCache@312312b3 size = 4, maxSize = 32, contextUsageCount = 1, parentContextCount = 0, hitCount = 350, missCount = 4, failureCount = 0]
+31-10-2026 13:50:59.420 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.springframework.test.context.cache.logStatistics - Spring test ApplicationContext cache statistics: [DefaultContextCache@312312b3 size = 4, maxSize = 32, contextUsageCount = 1, parentContextCount = 0, hitCount = 351, missCount = 4, failureCount = 0]
+31-10-2026 13:50:59.420 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.springframework.test.context.cache.logStatistics - Spring test ApplicationContext cache statistics: [DefaultContextCache@312312b3 size = 4, maxSize = 32, contextUsageCount = 1, parentContextCount = 0, hitCount = 352, missCount = 4, failureCount = 0]
+31-10-2026 13:50:59.420 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.springframework.test.context.cache.logStatistics - Spring test ApplicationContext cache statistics: [DefaultContextCache@312312b3 size = 4, maxSize = 32, contextUsageCount = 1, parentContextCount = 0, hitCount = 353, missCount = 4, failureCount = 0]
+31-10-2026 13:50:59.420 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.s.t.c.s.DirtiesContextTestExecutionListener.beforeOrAfterTestMethod - After test method: class [SchedulerWithMockedOutboxRepositoryComponentTest], method [scheduler_whenOutboxEventsExistButKafkaFails_publishesFails], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+31-10-2026 13:50:59.420 ?[35m[Test worker]?[0;39m ?[39mDEBUG?[0;39m o.s.t.c.w.ServletTestExecutionListener.afterTestMethod - Resetting RequestContextHolder for test class org.learnings.payments.paymentservice.componenttests.SchedulerWithMockedOutboxRepositoryComponentTest
+</pre>
+</span>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.8.2</a> at Oct 31, 2026, 1:51:10 PM</p>
+</div>
+</div>
+</body>
+</html>
