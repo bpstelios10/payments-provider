@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - createPayment_whenNoCurrency_usesDefaultCurrency()</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<div class="breadcrumbs">
+<a class="breadcrumb" href="../index.html">all</a> &gt; 
+<a class="breadcrumb" href="index.html">org.learnings.payments.paymentservice.adapters.inbound.controllers.PaymentsControllerTest</a> &gt; 
+<span class="breadcrumb">createPayment_whenNoCurrency_usesDefaultCurrency()</span>
+</div>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a class="successGroup" href="#">Gradle Test Run :payments-service:test</a>
+</li>
+</ul>
+<div class="tab">
+<h2>Gradle Test Run :payments-service:test</h2>
+<h1>createPayment_whenNoCurrency_usesDefaultCurrency()</h1>
+<div class="tab-container">
+<ul class="tabLinks">
+<li>
+<a class="" href="#">summary</a>
+</li>
+<li>
+<a class="" href="#">standard output</a>
+</li>
+<li>
+<a class="" href="#">error output</a>
+</li>
+</ul>
+<div class="tab">
+<h2>summary</h2>
+<div>
+<div class="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox">
+<div class="counter">1</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox">
+<div class="counter">0</div>
+<p>skipped</p>
+</div>
+</td>
+<td>
+<div class="infoBox duration">
+<div class="counter">1.447s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="tab">
+<h2>standard output</h2>
+<span class="code">
+<div class="clipboard-copy-btn-container">
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="root-0-test-stdout-createPayment_whenNoCurrency_usesDefaultCurrency()">Copy</button>
+</div>
+<pre id="root-0-test-stdout-createPayment_whenNoCurrency_usesDefaultCurrency()">14:28:10,337 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Found logback-core version 1.6.5
+14:28:10,339 |-INFO in ch.qos.logback.classic.util.ContextInitializer@6fc7e828 - Here is a list of configurators discovered as a service, by rank: 
+14:28:10,339 |-INFO in ch.qos.logback.classic.util.ContextInitializer@6fc7e828 -   org.springframework.boot.logging.logback.RootLogLevelConfigurator
+14:28:10,339 |-INFO in ch.qos.logback.classic.util.ContextInitializer@6fc7e828 - They will be invoked in order until ExecutionStatus.DO_NOT_INVOKE_NEXT_IF_ANY is returned.
+14:28:10,339 |-INFO in ch.qos.logback.classic.util.ContextInitializer@6fc7e828 - Constructed configurator of type class org.springframework.boot.logging.logback.RootLogLevelConfigurator
+14:28:10,342 |-INFO in ch.qos.logback.classic.util.ContextInitializer@6fc7e828 - org.springframework.boot.logging.logback.RootLogLevelConfigurator.configure() call lasted 1 milliseconds. ExecutionStatus=INVOKE_NEXT_IF_ANY
+14:28:10,342 |-INFO in ch.qos.logback.classic.util.ContextInitializer@6fc7e828 - Trying to configure with ch.qos.logback.classic.util.DefaultJoranConfigurator
+14:28:10,342 |-INFO in ch.qos.logback.classic.util.ContextInitializer@6fc7e828 - Constructed configurator of type class ch.qos.logback.classic.util.DefaultJoranConfigurator
+14:28:10,343 |-INFO in ch.qos.logback.classic.LoggerContext[default] - Found resource [logback-test.xml] at [file:/home/runner/work/payments-provider/payments-provider/payments-service/build/resources/test/logback-test.xml]
+14:28:10,470 |-INFO in ch.qos.logback.classic.model.processor.ConfigurationModelHandlerFull - Scan attribute not set.
+14:28:10,477 |-WARN in ch.qos.logback.core.model.processor.ImplicitModelHandler - Ignoring unknown property [springProfile] in [ch.qos.logback.classic.LoggerContext]
+14:28:10,492 |-INFO in ch.qos.logback.classic.model.processor.CallerInstructionLogic@26a9c6df - No contradictions in caller extraction instruction were detected
+14:28:10,493 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - Processing appender named [STDOUT]
+14:28:10,493 |-INFO in ch.qos.logback.core.model.processor.AppenderModelHandler - About to instantiate appender of type [ch.qos.logback.core.ConsoleAppender]
+14:28:10,499 |-INFO in ch.qos.logback.core.model.processor.ImplicitModelHandler - Assuming default type [ch.qos.logback.classic.encoder.PatternLayoutEncoder] for [encoder] property
+14:28:10,550 |-INFO in ch.qos.logback.core.ConsoleAppender[STDOUT] - NOTE: Writing to the console can be slow. Try to avoid logging to the 
+14:28:10,550 |-INFO in ch.qos.logback.core.ConsoleAppender[STDOUT] - console in production environments, especially in high volume systems.
+14:28:10,550 |-INFO in ch.qos.logback.core.ConsoleAppender[STDOUT] - See also https://logback.qos.ch/codes.html#slowConsole
+14:28:10,551 |-INFO in ch.qos.logback.classic.model.processor.RootLoggerModelHandler - Setting level of ROOT logger to DEBUG
+14:28:10,552 |-INFO in ch.qos.logback.core.model.processor.AppenderRefModelHandler - Attaching appender named [STDOUT] to Logger[ROOT]
+14:28:10,552 |-INFO in ch.qos.logback.core.model.processor.DefaultProcessor@2ce24a1a - End of configuration.
+14:28:10,553 |-INFO in ch.qos.logback.classic.joran.JoranConfigurator@26bce60d - Registering current configuration as safe fallback point
+14:28:10,553 |-INFO in ch.qos.logback.classic.util.ContextInitializer@6fc7e828 - ch.qos.logback.classic.util.DefaultJoranConfigurator.configure() call lasted 211 milliseconds. ExecutionStatus=DO_NOT_INVOKE_NEXT_IF_ANY
+
+</pre>
+</span>
+</div>
+<div class="tab">
+<h2>error output</h2>
+<span class="code">
+<div class="clipboard-copy-btn-container">
+<button class="clipboard-copy-btn" aria-label="Copy to clipboard" data-copy-element-id="root-0-test-stderr-createPayment_whenNoCurrency_usesDefaultCurrency()">Copy</button>
+</div>
+<pre id="root-0-test-stderr-createPayment_whenNoCurrency_usesDefaultCurrency()">Mockito is currently self-attaching to enable the inline-mock-maker. This will no longer work in future releases of the JDK. Please add Mockito as an agent to your build as described in Mockito's documentation: https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
+WARNING: A Java agent has been loaded dynamically (/home/runner/.gradle/caches/modules-2/files-2.1/net.bytebuddy/byte-buddy-agent/1.18.15/de6980bb799c25bb1fe9e6c434201299cb5e694e/byte-buddy-agent-1.18.15.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+</pre>
+</span>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="https://www.gradle.org">Gradle 9.8.2</a> at Oct 31, 2026, 2:28:42 PM</p>
+</div>
+</div>
+</body>
+</html>
