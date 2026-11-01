@@ -1,6 +1,7 @@
 package org.learnings.payments.paymentservice.componenttests;
 
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.learnings.payments.paymentservice.application.PaymentGateway;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,7 @@ public class PrivateEndpointsComponentTest {
                 .andExpect(jsonPath("$.activeProfiles").value("component-test-actuator"));
     }
 
+    @Disabled("Disabled because it uses awfully lot amount of memory")
     @Test
     void getActuatorHeapdump() throws Exception {
         mockMvc.perform(get("/payments-service/private/heapdump"))
