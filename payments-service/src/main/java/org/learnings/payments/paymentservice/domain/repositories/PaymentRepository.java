@@ -48,7 +48,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     @Query("""
             UPDATE Payment p
             SET p.status = :newStatus,
-                p.updatedDate = CURRENT_TIMESTAMP
+                p.updatedDate = instant
             WHERE p.paymentId = :paymentId AND p.status = :currentStatus""")
     int setStatusIfCurrentStatusIs(long paymentId, PaymentStatus newStatus, PaymentStatus currentStatus);
 }
