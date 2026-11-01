@@ -32,15 +32,15 @@ The fundamentals are right. Most findings below are about edge cases in exactly 
 
 ## P0 — Correctness, data loss, security
 
-### 1. Hibernate `ddl-auto: create` runs alongside Liquibase
-`payments-service/src/main/resources/application.yml`, `transactions-service/src/main/resources/application.yml`
+### ~~1. Hibernate `ddl-auto: create` runs alongside Liquibase~~
+~~`payments-service/src/main/resources/application.yml`, `transactions-service/src/main/resources/application.yml`~~
 
-Liquibase creates the schema, then Hibernate **drops and recreates it** at startup.
-- On Postgres, every restart wipes all payments and outbox rows.
-- The Liquibase-only objects are lost: the partial index `idx_outbox_polling_partial`, `idx_payments_status_processing_started`, and the column defaults.
-- Tests therefore run against a Hibernate-generated schema, not the migrated one.
+~~Liquibase creates the schema, then Hibernate **drops and recreates it** at startup.~~
+- ~~On Postgres, every restart wipes all payments and outbox rows.~~
+- ~~The Liquibase-only objects are lost: the partial index `idx_outbox_polling_partial`, `idx_payments_status_processing_started`, and the column defaults.~~
+- ~~Tests therefore run against a Hibernate-generated schema, not the migrated one.~~
 
-**Fix:** set `ddl-auto: validate` in every profile. Liquibase is the only schema owner.
+~~**Fix:** set `ddl-auto: validate` in every profile. Liquibase is the only schema owner.~~
 
 ### 2. Producer and consumer event contracts do not match, and nothing sends events
 `OutboxEventPublisher`, `KafkaOutboxEventSender`, `PaymentCapturedEventConsumer`
@@ -113,14 +113,14 @@ A timeout, connection reset or 5xx is an **unknown outcome**: the issuer may hav
 - The key belongs in the `Idempotency-Key` **header**, not the body. It needs a TTL/retention policy, and it should be a string rather than only a UUID.
 - The merchant's key is forwarded to the acquirer as-is. Use an internal per-attempt key instead.
 
-### 8. Actuator and H2 console expose secrets
-`application.yml` (both services)
+### ~~8. Actuator and H2 console expose secrets~~
+~~`application.yml` (both services)~~
 
-- `env`, `configprops` and `heapdump` are exposed. A heap dump contains DB credentials and, later, card data.
-- The H2 console is enabled with `web-allow-others: true`.
-- `show-sql: true` logs queries.
+- ~~`env`, `configprops` and `heapdump` are exposed. A heap dump contains DB credentials and, later, card data.~~
+- ~~The H2 console is enabled with `web-allow-others: true`.~~
+- ~~`show-sql: true` logs queries.~~
 
-**Fix:** expose only `health,prometheus` by default. Enable the rest via a `local` profile only, and protect the management port at the network level.
+~~**Fix:** expose only `health,prometheus` by default. Enable the rest via a `local` profile only, and protect the management port at the network level.~~
 
 ---
 
@@ -276,7 +276,7 @@ Four strategy classes plus a resolver encode a five-row transition table. Prefer
 
 ## Suggested order of work
 
-1. **P0 #1** (`ddl-auto: validate`) and **#8** (actuator/H2). These are config-only and quick.
+1. ~~**P0 #1** (`ddl-auto: validate`) and **#8** (actuator/H2). These are config-only and quick.~~
 2. **#2, #3, #11**: event contract, deterministic event IDs, publish-only-on-transition, a real Kafka producer, and a contract test.
 3. **#4, #5, #16**: fencing token, `Unknown` outcome plus status inquiry, Resilience4j.
 4. **#6, #7**: auth, merchant-scoped idempotency with request hash, opaque IDs.
