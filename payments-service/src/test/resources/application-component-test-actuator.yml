@@ -4,6 +4,12 @@ management:
   prometheus:
     metrics.export.enabled: true
 
+spring:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+  liquibase:
+    change-log: classpath:/db/changelog/changelog-test.yml
+
 outbox:
   spring:
     scheduling:

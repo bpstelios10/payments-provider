@@ -46,6 +46,7 @@ public class PaymentsWithMockedOutboxRepositoryComponentTest {
 
     @BeforeEach
     void setup() {
+        repository.deleteAll();
         doThrow(new CannotGetJdbcConnectionException("oops"))
                 .when(outboxEventRepository).save(any(OutboxEvent.class));
     }

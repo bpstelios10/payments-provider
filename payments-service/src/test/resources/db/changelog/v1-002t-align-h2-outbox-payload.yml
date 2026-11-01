@@ -1,0 +1,11 @@
+databaseChangeLog:
+
+    - changeSet:
+        id: v1-003-align-h2-outbox-payload
+        author: stelios
+        dbms: h2
+        changes:
+          - modifyDataType:
+              tableName: outbox_event
+              columnName: payload
+              newDataType: VARCHAR
