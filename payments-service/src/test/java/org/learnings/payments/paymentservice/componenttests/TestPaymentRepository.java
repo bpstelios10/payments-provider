@@ -8,4 +8,7 @@ import org.springframework.stereotype.Repository;
 public interface TestPaymentRepository extends JpaRepository<Payment, Long> {
 
     Payment findByPaymentId(Long paymentId);
+
+    @Override
+    void deleteAll();
 }
