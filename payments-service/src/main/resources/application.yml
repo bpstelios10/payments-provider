@@ -32,7 +32,7 @@ spring:
     username: ${DB_USERNAME:dbuser}
     password: ${DB_PASSWORD:dbpass}
   jpa:
-    database-platform: 'org.hibernate.dialect.PostgreSQLDialect'
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: 'validate'
     show-sql: true

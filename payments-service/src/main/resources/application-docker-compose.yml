@@ -16,6 +16,8 @@ spring:
 #      mode: 'always'
 #      schema-locations: 'classpath:schema-local.sql'
 #      data-locations: 'classpath:data-embedded.sql'
+  jpa:
+    database-platform: 'org.hibernate.dialect.PostgreSQLDialect'
   h2:
     console:
       enabled: false
