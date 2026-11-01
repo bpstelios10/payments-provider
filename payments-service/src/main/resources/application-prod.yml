@@ -1,0 +1,21 @@
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health
+  endpoint:
+    heapdump:
+      enabled: false
+
+spring:
+  datasource:
+    driverClassName: 'org.postgresql.Driver'
+    url: 'jdbc:postgresql://postgres-db:5432/psp'
+  jpa:
+    database-platform: 'org.hibernate.dialect.PostgreSQLDialect'
+    show-sql: false
+  h2:
+    console:
+      enabled: false
+  liquibase:
+    contexts: prod

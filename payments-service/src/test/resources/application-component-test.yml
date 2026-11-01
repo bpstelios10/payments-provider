@@ -2,8 +2,6 @@ service:
   processing-status-timeout-seconds: 2
 
 spring:
-  jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
   liquibase:
     change-log: classpath:/db/changelog/changelog-test.yml
 
