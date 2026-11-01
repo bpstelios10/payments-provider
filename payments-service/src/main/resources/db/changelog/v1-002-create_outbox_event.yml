@@ -9,7 +9,7 @@ databaseChangeLog:
         onError: HALT
         not:
           tableExists:
-            tableName: outbox_eventauthor
+            tableName: outbox_event
       changes:
         - createTable:
             tableName: outbox_event
